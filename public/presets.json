@@ -1,0 +1,20 @@
+[
+  {
+    "id": "cyberdrift",
+    "name": "Cybernetic Neon Drift",
+    "description": "Synthwave melódico com batida marcante e um arpejo brilhante.",
+    "code": "// CYBERNETIC NEON DRIFT - 100% SINTETIZADO (RODA OFFLINE)\nbpm(120);\n\n// Configuração de Sintetizadores (Plugins)\ndefineSynth(\"kick\", \"kick\", 0.00, 0.12, 0.00, 0.10, 120, 1.0, 0.00, 0.00);\ndefineSynth(\"snare\", \"snare\", 0.00, 0.15, 0.00, 0.10, 1000, 1.0, 0.00, 0.00);\ndefineSynth(\"hihat\", \"hihat\", 0.00, 0.05, 0.00, 0.05, 7500, 1.0, 0.00, 0.00);\ndefineSynth(\"bass\", \"sawtooth\", 0.01, 0.25, 0.60, 0.15, 950, 6.0, 0.00, 0.00);\ndefineSynth(\"lead\", \"square\", 0.01, 0.18, 0.30, 0.10, 1400, 3.0, 0.40, 0.20);\n\n// Sequências de Passos (Padrões)\nkick(\"x .*3 x .*3 x .*3 x .*3\");\nsnare(\".*4 x .*7 x .*3\");\nhihat(\"x*16\");\nbass(\"C3*2 Eb3*2 F3*2 G3*2 C3*2 Eb3*2 F3*2 G3*2\");\nlead(\"C4 . Eb4 . G4 . C5 . Bb4 . G4 . F4 . Eb4 .\");"
+  },
+  {
+    "id": "acid",
+    "name": "Acid Industrial",
+    "description": "Techno industrial e ácido com sintetizador analógico 303.",
+    "code": "// ACID INDUSTRIAL - 100% SINTETIZADO (RODA OFFLINE)\nbpm(135);\n\n// Configuração de Sintetizadores (Plugins)\ndefineSynth(\"kick\", \"kick\", 0.00, 0.15, 0.00, 0.10, 100, 1.0, 0.00, 0.00);\ndefineSynth(\"snare\", \"snare\", 0.00, 0.15, 0.00, 0.10, 1000, 1.0, 0.00, 0.00);\ndefineSynth(\"hihat\", \"hihat\", 0.00, 0.05, 0.00, 0.05, 7500, 1.0, 0.00, 0.00);\ndefineSynth(\"bass\", \"sawtooth\", 0.01, 0.12, 0.40, 0.10, 550, 12.0, 0.00, 0.00);\ndefineSynth(\"lead\", \"sawtooth\", 0.01, 0.15, 0.50, 0.10, 1000, 4.0, 0.20, 0.15);\n\n// Sequências de Passos (Padrões)\nkick(\"x .*3 x .*3 x .*3 x .*3\");\nsnare(\".*4 x .*7 x .*3\");\nhihat(\"x . x . x . x . x . x . x . x .\");\nbass(\"D3 F3 G3 G#3 G3 F3 D3 C3 D3 F3 G3 G#3 G3 F3 D3 .\");\nlead(\"D4 . D4 . F4 . F4 . G4 . G#4 . G4 . F4 .\");"
+  },
+  {
+    "id": "ambient",
+    "name": "Ambient Dreams",
+    "description": "Pads e texturas flutuantes de sintetizador senoidal.",
+    "code": "// AMBIENT DREAMS - 100% SINTETIZADO (RODA OFFLINE)\nbpm(90);\n\n// Configuração de Sintetizadores (Plugins)\ndefineSynth(\"kick\", \"kick\", 0.00, 0.25, 0.00, 0.20, 80, 1.0, 0.00, 0.00);\ndefineSynth(\"snare\", \"snare\", 0.00, 0.15, 0.00, 0.10, 1000, 1.0, 0.00, 0.00);\ndefineSynth(\"hihat\", \"hihat\", 0.00, 0.05, 0.00, 0.05, 7500, 1.0, 0.00, 0.00);\ndefineSynth(\"bass\", \"sine\", 0.10, 0.80, 0.80, 0.60, 300, 1.0, 0.00, 0.00);\ndefineSynth(\"lead\", \"triangle\", 0.15, 0.60, 0.60, 0.50, 900, 1.0, 0.50, 0.40);\n\n// Sequências de Passos (Padrões)\nkick(\"x .*7 x .*7\");\nsnare(\".*16\");\nhihat(\".*16\");\nbass(\"F3 .*3 A3 .*3 Bb3 .*3 C3 .*3\");\nlead(\"F4 . A4 . C5 . F5 . E5 . C5 . Bb4 . A4 .\");"
+  }
+]
