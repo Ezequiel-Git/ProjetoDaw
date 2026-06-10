@@ -2467,9 +2467,8 @@
             };
         })();
 
-        const _base = import.meta.env?.BASE_URL ?? '/';
-        const PRESETS_URL = _base.replace(/\/$/, '') + '/presets.json';
-        const INSTRUMENTS_URL = _base.replace(/\/$/, '') + '/instruments.json';
+        const PRESETS_URL = './presets.json';
+        const INSTRUMENTS_URL = './instruments.json';
 
         function isDrumType(type) {
             return [
