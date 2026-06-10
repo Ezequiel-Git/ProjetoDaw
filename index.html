@@ -2467,8 +2467,9 @@
             };
         })();
 
-        const PRESETS_URL = '/presets.json';
-        const INSTRUMENTS_URL = '/instruments.json';
+        const _base = import.meta.env?.BASE_URL ?? '/';
+        const PRESETS_URL = _base.replace(/\/$/, '') + '/presets.json';
+        const INSTRUMENTS_URL = _base.replace(/\/$/, '') + '/instruments.json';
 
         function isDrumType(type) {
             return [
@@ -8213,15 +8214,7 @@
         function getTodos() {
             let todos = localStorage.getItem('strudel_daw_todos');
             if (!todos) {
-                // Default starter tasks for production
-                const defaultTodos = [
-                    { id: 1, text: "🎹 Compor uma melodia na aba PIANO ROLL", completed: false },
-                    { id: 2, text: "🎛️ Adicionar variações no CHANNEL RACK", completed: false },
-                    { id: 3, text: "🎚️ Ativar Humanizador e Sustain no lead", completed: false },
-                    { id: 4, text: "💾 Salvar meu arranjo na aba SALVAS", completed: false }
-                ];
-                localStorage.setItem('strudel_daw_todos', JSON.stringify(defaultTodos));
-                return defaultTodos;
+                return [];
             }
             return JSON.parse(todos);
         }
