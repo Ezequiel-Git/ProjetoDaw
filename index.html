@@ -19,21 +19,21 @@
     
     <style>
         :root {
-            --bg-dark: #040407;
-            --panel-bg: rgba(13, 13, 20, 0.65);
-            --panel-header: rgba(22, 22, 33, 0.82);
-            --border-daw: rgba(255, 255, 255, 0.06);
-            --border-daw-focus: #ff5533; /* FL Studio Orange */
-            --glass-blur: blur(16px);
+            --bg-dark: #030306;
+            --panel-bg: rgba(10, 10, 18, 0.75);
+            --panel-header: rgba(18, 18, 28, 0.92);
+            --border-daw: rgba(255, 255, 255, 0.07);
+            --border-daw-focus: #ff5533;
+            --glass-blur: blur(18px);
             
             --glow-orange: #ff5533;
-            --glow-green: #39e75f;
+            --glow-green: #2edb5a;
             --glow-cyan: #00e5ff;
-            --glow-magenta: #ff007f;
-            --glow-yellow: #ffcc00;
+            --glow-magenta: #e0007f;
+            --glow-yellow: #ffc800;
             
-            --text-primary: #e2e2ec;
-            --text-secondary: #8e8e9f;
+            --text-primary: #e4e4f0;
+            --text-secondary: #7e7e96;
             --text-dark: #050507;
         }
 
@@ -59,12 +59,12 @@
         body {
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 50% 0%, rgba(255, 85, 51, 0.08) 0%, transparent 60%),
-                radial-gradient(circle at 0% 100%, rgba(0, 229, 255, 0.04) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(255, 0, 127, 0.03) 0%, transparent 40%),
-                linear-gradient(rgba(255, 255, 255, 0.003) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.003) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 100% 100%, 24px 24px, 24px 24px;
+                radial-gradient(ellipse at 50% -10%, rgba(255, 85, 51, 0.12) 0%, transparent 55%),
+                radial-gradient(ellipse at -10% 100%, rgba(0, 229, 255, 0.05) 0%, transparent 45%),
+                radial-gradient(ellipse at 110% 100%, rgba(224, 0, 127, 0.04) 0%, transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.0025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.0025) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 30px 30px, 30px 30px;
             color: var(--text-primary);
             font-family: 'Outfit', 'Segoe UI', -apple-system, sans-serif;
             margin: 0;
@@ -96,33 +96,43 @@
 
         /* --- PAINEL DE CONTROLE SUPERIOR (DAW TRANSPORT) --- */
         .transport-bar {
-            background: var(--panel-header);
-            border-bottom: 2px solid var(--border-daw);
-            padding: 10px 20px;
+            background: rgba(10, 10, 18, 0.97);
+            border-bottom: 1px solid rgba(255,85,51,0.15);
+            padding: 8px 16px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            flex-wrap: wrap;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            justify-content: flex-start;
+            gap: 12px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: visible;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255,85,51,0.08);
             z-index: 10;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,85,51,0.3) transparent;
+            -webkit-overflow-scrolling: touch;
+            backdrop-filter: blur(20px);
         }
+        .transport-bar::-webkit-scrollbar { height: 4px; }
+        .transport-bar::-webkit-scrollbar-thumb { background: rgba(255,85,51,0.3); border-radius: 2px; }
 
         .logo-area {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            flex-shrink: 0;
         }
 
         .logo-area h1 {
             font-family: 'Orbitron', 'Trebuchet MS', sans-serif;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 900;
             margin: 0;
             letter-spacing: 2px;
             background: linear-gradient(45deg, var(--glow-orange), var(--glow-yellow));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            white-space: nowrap;
         }
 
         .logo-area span {
@@ -136,14 +146,24 @@
             font-family: 'Fira Code', 'Consolas', monospace;
         }
 
+        /* Thin vertical divider for grouping controls in transport bar */
+        .transport-divider {
+            width: 1px;
+            height: 28px;
+            background: rgba(255,255,255,0.06);
+            flex-shrink: 0;
+            align-self: center;
+        }
+
         .transport-controls {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background: #111115;
-            padding: 6px 12px;
+            gap: 6px;
+            background: rgba(8,8,12,0.7);
+            padding: 5px 10px;
             border-radius: 8px;
-            border: 1px solid var(--border-daw);
+            border: 1px solid rgba(255,255,255,0.06);
+            flex-shrink: 0;
         }
 
         .transport-btn {
@@ -255,7 +275,18 @@
             overflow: hidden;
         }
 
+        /* Hide HTML5 spin-buttons for number input (LCD display look) */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
         .display-lcd::after {
+
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -318,17 +349,39 @@
         .bpm-control {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             background: #111115;
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
-            border: 1px solid var(--border-daw);
+            border: 1px solid rgba(255,85,51,0.2);
+            flex-shrink: 0;
         }
-
-        .bpm-control input[type=range] {
-            width: 100px;
+        .bpm-number-input {
+            width: 56px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,85,51,0.35);
+            border-radius: 5px;
+            color: var(--glow-orange);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 3px 4px;
+            outline: none;
+            -moz-appearance: textfield;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .bpm-number-input:focus {
+            border-color: var(--glow-orange);
+            box-shadow: 0 0 8px rgba(255,85,51,0.4);
+        }
+        .bpm-number-input::-webkit-inner-spin-button,
+        .bpm-number-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .bpm-mini-slider {
+            width: 70px;
             accent-color: var(--glow-orange);
             cursor: pointer;
+            flex-shrink: 0;
         }
 
         /* --- CORPO PRINCIPAL DA DAW --- */
@@ -339,9 +392,9 @@
         }
 
         .daw-sidebar {
-            width: 300px;
-            background: var(--panel-bg);
-            border-right: 2px solid var(--border-daw);
+            width: 280px;
+            background: rgba(8, 8, 15, 0.98);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -461,14 +514,14 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            background: #0d0d13;
+            background: #07070e;
         }
 
         .workspace-tabs {
             display: flex;
-            background: var(--panel-header);
-            border-bottom: 2px solid var(--border-daw);
-            padding: 0 10px;
+            background: rgba(12, 12, 22, 0.98);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0 8px;
             overflow-x: auto;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
@@ -493,27 +546,30 @@
             flex-shrink: 0;
             background: none;
             border: none;
-            border-bottom: 3px solid transparent;
+            border-bottom: 2px solid transparent;
             color: var(--text-secondary);
-            padding: 14px 20px;
+            padding: 12px 18px;
             cursor: pointer;
             font-family: 'Orbitron', 'Trebuchet MS', sans-serif;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 700;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            letter-spacing: 0.5px;
+            position: relative;
         }
 
         .workspace-tab-btn:hover {
-            color: white;
+            color: rgba(255,255,255,0.8);
+            border-bottom-color: rgba(255,255,255,0.1);
         }
 
         .workspace-tab-btn.active {
             color: var(--glow-orange);
             border-bottom-color: var(--glow-orange);
-            background: rgba(255, 85, 51, 0.04);
+            background: linear-gradient(to bottom, transparent, rgba(255, 85, 51, 0.04));
         }
 
         .workspace-content {
@@ -538,13 +594,13 @@
             flex-direction: column;
             flex: 1;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.04);
         }
 
         .card-header {
-            background: var(--panel-header);
+            background: linear-gradient(135deg, rgba(18, 18, 30, 0.95) 0%, rgba(24, 24, 38, 0.9) 100%);
             border-bottom: 1px solid var(--border-daw);
-            padding: 8px 16px;
+            padding: 10px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -552,22 +608,24 @@
 
         .card-title {
             font-family: 'Orbitron', 'Trebuchet MS', sans-serif;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
             color: var(--text-secondary);
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             display: flex;
             align-items: center;
             gap: 8px;
+            text-transform: uppercase;
         }
 
         .card-title::before {
             content: "";
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
             background: var(--glow-orange);
             border-radius: 50%;
-            box-shadow: 0 0 5px var(--glow-orange);
+            box-shadow: 0 0 6px var(--glow-orange), 0 0 12px rgba(255,85,51,0.4);
+            flex-shrink: 0;
         }
 
         #code-editor {
@@ -618,22 +676,23 @@
         }
 
         .btn-action {
-            background: var(--glow-orange);
-            color: var(--text-dark);
-            border: none;
-            padding: 8px 16px;
+            background: rgba(255,85,51,0.1);
+            color: var(--glow-orange);
+            border: 1px solid rgba(255,85,51,0.3);
+            padding: 7px 14px;
             border-radius: 6px;
             font-family: 'Orbitron', 'Trebuchet MS', sans-serif;
             font-size: 0.75rem;
-            font-weight: 900;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
             white-space: nowrap;
         }
 
         .btn-action:hover {
-            background: #ff7755;
-            box-shadow: 0 0 15px rgba(255, 85, 51, 0.4);
+            background: rgba(255,85,51,0.2);
+            border-color: var(--glow-orange);
+            box-shadow: 0 0 12px rgba(255, 85, 51, 0.3);
             transform: translateY(-1px);
         }
 
@@ -653,20 +712,20 @@
         }
 
         .channel-rack {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-daw);
+            background: rgba(7, 7, 14, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            gap: 12px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
             overflow: auto;
         }
 
         .channel-row {
             display: grid;
-            grid-template-columns: 310px 1fr;
+            grid-template-columns: 360px 1fr;
             align-items: center;
             gap: 15px;
             width: max-content;
@@ -830,46 +889,46 @@
 
         .step-grid {
             display: flex;
-            gap: 5px;
-            background: #07070a;
-            padding: 6px;
+            gap: 4px;
+            background: rgba(4, 4, 8, 0.95);
+            padding: 5px;
             border-radius: 6px;
-            border: 1px solid var(--border-daw);
+            border: 1px solid rgba(255,255,255,0.04);
             width: fit-content;
         }
 
         .step-led {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             flex-shrink: 0;
-            background: #1d1d28;
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.03);
+            background: #141420;
+            border-radius: 3px;
+            border: 1px solid rgba(255,255,255,0.04);
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.12s;
         }
 
-        .step-led:nth-child(4n+1), .step-led:nth-child(4n+2), .step-led:nth-child(4n+3), .step-led:nth-child(4n+4) {
-            background: #252533;
-        }
-        .step-led:nth-child(8n+1), .step-led:nth-child(8n+2), .step-led:nth-child(8n+3), .step-led:nth-child(8n+4) {
-            background: #333347;
+        /* Every 4 steps: slightly brighter background for beat grouping */
+        .step-led:nth-child(8n+1), .step-led:nth-child(8n+2),
+        .step-led:nth-child(8n+3), .step-led:nth-child(8n+4) {
+            background: #1a1a2a;
         }
 
         .step-led.active {
             background: var(--glow-orange) !important;
-            box-shadow: 0 0 8px var(--glow-orange);
-            border-color: #ffa680;
+            box-shadow: 0 0 6px var(--glow-orange), 0 0 12px rgba(255,85,51,0.3);
+            border-color: rgba(255,140,100,0.6);
         }
 
         .step-led.playhead {
-            border-color: white !important;
-            transform: scale(1.1);
+            border-color: rgba(255,255,255,0.6) !important;
+            transform: scale(1.12);
+            box-shadow: 0 0 6px rgba(255,255,255,0.3);
         }
 
         .step-led.active.playhead {
             background: #ffffff !important;
-            box-shadow: 0 0 12px #ffffff;
+            box-shadow: 0 0 14px #ffffff, 0 0 4px rgba(255,255,255,0.8);
         }
 
         /* --- PIANO ROLL STYLES --- */
@@ -1765,10 +1824,8 @@
                 min-height: 100vh;
             }
             .transport-bar {
-                flex-wrap: wrap;
-                gap: 12px;
-                justify-content: center;
-                padding: 15px;
+                gap: 10px;
+                padding: 8px 12px;
             }
             .piano-keyboard-card {
                 margin: 10px;
@@ -1779,119 +1836,34 @@
             body {
                 overflow-x: hidden;
             }
-            /* Modern, compact, glassmorphic layout for mobile transport bar */
+            /* Transport bar scrolls horizontally on mobile — stays compact */
             .transport-bar {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 12px;
-                padding: 12px 15px;
-                border-radius: 0 0 16px 16px;
-                background: rgba(16, 16, 22, 0.95);
-                backdrop-filter: blur(15px);
-                border-bottom: 2px solid rgba(255, 255, 255, 0.05);
-            }
-            .logo-area {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
+                padding: 7px 10px;
                 gap: 8px;
-                justify-content: center;
-                width: 100%;
             }
             .logo-area h1 {
-                font-size: 1.05rem !important;
-                letter-spacing: 1.5px;
-                margin: 0;
-            }
-            .logo-area span {
-                font-size: 0.55rem;
-                padding: 1px 4px;
-                border: 1px solid rgba(255,255,255,0.15);
-                border-radius: 4px;
-                opacity: 0.8;
-            }
-            .transport-controls {
-                display: flex;
-                justify-content: center;
-                gap: 12px;
-                width: 100%;
-                background: rgba(0, 0, 0, 0.2);
-                padding: 8px 15px;
-                border-radius: 12px;
-                border: 1px solid rgba(255,255,255,0.03);
+                font-size: 1rem !important;
+                letter-spacing: 1px;
             }
             .transport-btn {
-                width: 38px !important;
-                height: 38px !important;
-                border-radius: 50% !important; /* circular button style */
+                width: 32px !important;
+                height: 32px !important;
             }
-            .bpm-control {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                width: 100%;
-                background: rgba(0,0,0,0.15);
-                padding: 6px 12px;
-                border-radius: 10px;
-                border: 1px solid rgba(255,255,255,0.02);
+            .bpm-mini-slider {
+                width: 50px !important;
             }
-            .bpm-control #bpm-slider {
-                flex: 1;
-                margin: 0 15px;
-            }
-            .bpm-control .display-lcd {
-                min-width: 55px !important;
-                padding: 3px 8px !important;
-            }
-            /* Row for two LCD monitors side-by-side */
-            .transport-bar > div[style*="display: flex; gap: 10px;"] {
-                display: flex;
-                width: 100%;
-                justify-content: space-between;
-                gap: 10px !important;
-            }
-            .transport-bar > div[style*="display: flex; gap: 10px;"] .display-lcd {
-                flex: 1;
-                min-width: 0 !important;
-                padding: 6px 10px !important;
-            }
-            /* Theme selector styling row */
-            .transport-bar > div[style*="flex-direction: column; gap: 3px;"] {
-                flex-direction: row !important;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                background: rgba(0,0,0,0.15);
-                padding: 6px 12px;
-                border-radius: 10px;
-                border: 1px solid rgba(255,255,255,0.02);
-                box-sizing: border-box;
-            }
-            .transport-bar > div[style*="flex-direction: column; gap: 3px;"] span {
-                font-size: 0.65rem !important;
-                color: var(--glow-cyan);
-            }
-            .transport-bar > div[style*="flex-direction: column; gap: 3px;"] select {
-                width: 60% !important;
-                padding: 4px 8px !important;
-                font-size: 0.7rem !important;
+            .bpm-number-input {
+                width: 46px !important;
+                font-size: 0.85rem !important;
             }
             /* Save / Import / Export buttons row */
             .project-actions {
-                display: flex;
-                width: 100%;
-                justify-content: space-between;
-                gap: 8px !important;
-                margin-left: 0 !important;
+                gap: 5px !important;
+                margin-left: 4px !important;
             }
             .project-actions .btn-action {
-                flex: 1;
-                padding: 8px 5px !important;
-                font-size: 0.7rem !important;
-                border-radius: 8px !important;
-                text-align: center;
-                display: block;
+                padding: 5px 8px !important;
+                font-size: 0.65rem !important;
             }
             .workspace-tabs {
                 overflow-x: auto;
@@ -1930,18 +1902,22 @@
             .master-strip {
                 flex: 0 0 80px;
             }
-            /* Channel controls and rack scrolling */
+            /* Channel controls and rack scrolling override */
             .channel-row {
-                grid-template-columns: 1fr;
-                width: 100%;
-                gap: 10px;
+                grid-template-columns: 360px 1fr !important;
+                width: max-content;
+                min-width: 100%;
+                gap: 15px;
                 border-bottom: 1px solid rgba(255,255,255,0.05);
-                padding-bottom: 15px;
+                padding-bottom: 5px;
             }
             .channel-controls {
-                width: 100%;
-                flex-wrap: wrap;
-                position: relative; /* remove sticky on mobile for single column stack */
+                width: 360px !important;
+                flex-wrap: nowrap !important;
+                flex-shrink: 0;
+                position: sticky;
+                left: 0;
+                z-index: 2;
             }
             .step-grid {
                 overflow-x: auto;
@@ -2163,11 +2139,13 @@
         <header class="transport-bar">
             <div class="logo-area">
                 <h1>PROJECT DAW</h1>
-                <span>CYBER ENGINE v6.0</span>
+                <span>CYBER v6.0</span>
             </div>
 
+            <div class="transport-divider"></div>
+
             <!-- Controles do Player -->
-            <div class="transport-controls" style="display: flex; align-items: center; gap: 8px;">
+            <div class="transport-controls">
                 <!-- PAT/SONG Selector -->
                 <div class="patsong-selector" style="display: flex; background: #08080a; padding: 2px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); gap: 2px;">
                     <button id="btn-mode-pat" class="patsong-btn active" style="background: var(--glow-orange); color: var(--text-dark); border: none; font-family: 'Orbitron', sans-serif; font-size: 0.65rem; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-weight: 900; transition: all 0.2s; box-shadow: 0 0 8px var(--glow-orange);">PAT</button>
@@ -2199,43 +2177,49 @@
                 <span id="record-time-display" style="font-size: 0.7rem; color: #ff3333; font-family: 'Orbitron', sans-serif; display: none; margin-left: 5px; font-weight: bold; min-width: 50px;">🔴 0.0s</span>
             </div>
 
+            <div class="transport-divider"></div>
+
             <!-- Controles de BPM -->
             <div class="bpm-control">
-                <span class="lcd-label" style="font-family: 'Orbitron', sans-serif; font-size: 0.7rem; color: var(--glow-orange);">BPM:</span>
-                <input type="range" id="bpm-slider" min="60" max="220" step="1" value="120">
-                <div class="display-lcd" style="min-width: 60px; padding: 4px 8px;">
-                    <div class="lcd-value" id="display-bpm" style="color: var(--glow-orange); font-size: 1rem;">120</div>
-                </div>
+                <span style="font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: var(--glow-orange); letter-spacing: 1px; flex-shrink: 0;">BPM</span>
+                <input type="range" id="bpm-slider" class="bpm-mini-slider" min="60" max="220" step="1" value="120">
+                <input type="number" id="display-bpm" class="bpm-number-input" min="60" max="220" value="120">
             </div>
 
+            <div class="transport-divider"></div>
+
             <!-- LCD Displays para Monitoramento -->
-            <div style="display: flex; gap: 10px;">
-                <div class="display-lcd">
+            <div style="display: flex; gap: 8px; flex-shrink: 0;">
+                <div class="display-lcd" style="min-width: 70px; padding: 4px 10px;">
                     <span class="lcd-label">CYCLES</span>
                     <span class="lcd-value" id="display-cycles">0.00</span>
                 </div>
-                <div class="display-lcd">
-                    <span class="lcd-label">PLAY TIME</span>
+                <div class="display-lcd" style="min-width: 70px; padding: 4px 10px;">
+                    <span class="lcd-label">TIME</span>
                     <span class="lcd-value" id="display-time">0.0s</span>
                 </div>
             </div>
 
+            <div class="transport-divider"></div>
+
             <!-- Seletor de Tema Estético -->
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-                <span style="font-family: 'Orbitron', sans-serif; font-size: 0.65rem; color: var(--glow-cyan); letter-spacing: 1px;">THEME SYSTEM</span>
-                <select id="theme-select" style="background: rgba(8, 8, 12, 0.85); border: 1px solid var(--border-daw); color: var(--text-primary); font-family: 'Orbitron', sans-serif; font-size: 0.75rem; padding: 5px 10px; border-radius: 6px; outline: none; cursor: pointer; transition: all 0.2s; box-shadow: inset 0 0 6px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.06);">
-                    <option value="cyberpunk">Cyberpunk (Padrão)</option>
-                    <option value="acid">Acid Toxic Lime</option>
-                    <option value="synthwave">Synthwave Sunset</option>
-                    <option value="deepspace">Deep Space Silver</option>
+            <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                <span style="font-family: 'Orbitron', sans-serif; font-size: 0.6rem; color: var(--glow-cyan); letter-spacing: 1px; white-space: nowrap;">THEME</span>
+                <select id="theme-select" style="background: rgba(8, 8, 12, 0.85); border: 1px solid rgba(255,255,255,0.06); color: var(--text-primary); font-family: 'Orbitron', sans-serif; font-size: 0.7rem; padding: 5px 8px; border-radius: 6px; outline: none; cursor: pointer; transition: all 0.2s; box-shadow: inset 0 0 6px rgba(0,0,0,0.5);">
+                    <option value="cyberpunk">Cyberpunk</option>
+                    <option value="acid">Acid Lime</option>
+                    <option value="synthwave">Synthwave</option>
+                    <option value="deepspace">Deep Space</option>
                 </select>
             </div>
 
+            <div class="transport-divider"></div>
+
             <!-- Importar / Exportar Projeto -->
-            <div class="project-actions" style="display: flex; gap: 8px; margin-left: 10px;">
-                <button class="btn-action" id="btn-save-project-header" style="padding: 6px 12px; font-size: 0.75rem; border-color: rgba(0, 230, 118, 0.3); background: rgba(0, 230, 118, 0.05); color: var(--glow-green);">💾 SALVAR</button>
-                <button class="btn-action" id="btn-import-project" style="padding: 6px 12px; font-size: 0.75rem; border-color: rgba(0, 229, 255, 0.3); background: rgba(0, 229, 255, 0.05); color: var(--glow-cyan);">📥 IMPORTAR</button>
-                <button class="btn-action" id="btn-export-project" style="padding: 6px 12px; font-size: 0.75rem; border-color: rgba(255, 85, 51, 0.3); background: rgba(255, 85, 51, 0.05); color: var(--glow-orange);">📤 EXPORTAR</button>
+            <div class="project-actions" style="display: flex; gap: 6px; flex-shrink: 0;">
+                <button class="btn-action" id="btn-save-project-header" style="padding: 5px 10px; font-size: 0.7rem; border-color: rgba(0, 230, 118, 0.3); background: rgba(0, 230, 118, 0.05); color: var(--glow-green);">💾 SAVE</button>
+                <button class="btn-action" id="btn-import-project" style="padding: 5px 10px; font-size: 0.7rem; border-color: rgba(0, 229, 255, 0.3); background: rgba(0, 229, 255, 0.05); color: var(--glow-cyan);">📥 LOAD</button>
+                <button class="btn-action" id="btn-export-project" style="padding: 5px 10px; font-size: 0.7rem; border-color: rgba(255, 85, 51, 0.3); background: rgba(255, 85, 51, 0.05); color: var(--glow-orange);">📤 EXPORT</button>
                 <input type="file" id="input-import-project" accept=".json" style="display: none;">
             </div>
         </header>
@@ -9193,7 +9177,7 @@
         // Controlar BPM Slider
         document.getElementById('bpm-slider').addEventListener('input', (e) => {
             const val = parseInt(e.target.value);
-            document.getElementById('display-bpm').innerText = val;
+            document.getElementById('display-bpm').value = val;
             if (activeParsedCode) {
                 activeParsedCode.bpm = val;
             }
@@ -9202,6 +9186,33 @@
             const regex = /bpm\(\s*\d+\s*\);?/i;
             updateCodeEditorParam(regex, `bpm(${val});`);
         });
+
+        // Writable direct BPM input field listener
+        const displayBpmInput = document.getElementById('display-bpm');
+        if (displayBpmInput) {
+            // Getter/setter compatibility override to prevent other legacy code from breaking
+            Object.defineProperty(displayBpmInput, 'innerText', {
+                get: function() { return this.value; },
+                set: function(val) { this.value = val; },
+                configurable: true
+            });
+
+            displayBpmInput.addEventListener('input', (e) => {
+                let val = parseInt(e.target.value);
+                if (isNaN(val)) return;
+                if (val < 60) val = 60;
+                if (val > 220) val = 220;
+                
+                document.getElementById('bpm-slider').value = val;
+                if (activeParsedCode) {
+                    activeParsedCode.bpm = val;
+                }
+                
+                const regex = /bpm\(\s*\d+\s*\);?/i;
+                updateCodeEditorParam(regex, `bpm(${val});`);
+            });
+        }
+
 
         // Event Listeners para presets de som
         document.getElementById('sound-preset-select').addEventListener('change', (e) => {
