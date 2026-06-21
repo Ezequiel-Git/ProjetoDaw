@@ -167,56 +167,60 @@
         }
 
         .transport-btn {
-            background: #1b1b24;
-            border: 1px solid rgba(255,255,255,0.05);
+            background: linear-gradient(135deg, #1c1c28 0%, #11111a 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             color: var(--text-secondary);
-            width: 38px;
-            height: 38px;
-            border-radius: 6px;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05);
         }
 
         .transport-btn:hover {
             color: white;
-            border-color: rgba(255,255,255,0.2);
-            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1);
         }
 
-        .transport-btn.btn-play:hover {
-            background: rgba(57, 231, 95, 0.15);
+        .transport-btn.btn-play:hover, .transport-btn.btn-play.active {
+            background: linear-gradient(135deg, rgba(46, 219, 90, 0.15) 0%, rgba(46, 219, 90, 0.03) 100%);
             color: var(--glow-green);
             border-color: var(--glow-green);
-            box-shadow: 0 0 10px rgba(57, 231, 95, 0.3);
+            box-shadow: 0 0 15px rgba(46, 219, 90, 0.35), inset 0 1px 1px rgba(46, 219, 90, 0.1);
         }
 
         .transport-btn.btn-stop:hover {
-            background: rgba(255, 0, 127, 0.15);
+            background: linear-gradient(135deg, rgba(255, 0, 127, 0.15) 0%, rgba(255, 0, 127, 0.03) 100%);
             color: var(--glow-magenta);
             border-color: var(--glow-magenta);
-            box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
-        }        .transport-btn.btn-pause:hover {
-            background: rgba(0, 229, 255, 0.15);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.35), inset 0 1px 1px rgba(255, 0, 127, 0.1);
+        }
+
+        .transport-btn.btn-pause:hover {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15) 0%, rgba(0, 229, 255, 0.03) 100%);
             color: var(--glow-cyan);
             border-color: var(--glow-cyan);
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.35), inset 0 1px 1px rgba(0, 229, 255, 0.1);
         }
 
         .transport-btn.btn-pause.active {
-            background: rgba(0, 229, 255, 0.25) !important;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.25) 0%, rgba(0, 229, 255, 0.05) 100%) !important;
             border-color: var(--glow-cyan) !important;
             color: var(--glow-cyan) !important;
-            box-shadow: 0 0 10px rgba(0, 229, 255, 0.5) !important;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5), inset 0 1px 1px rgba(0, 229, 255, 0.2) !important;
         }
 
         .transport-btn.btn-record {
             color: var(--glow-orange);
-            border-color: rgba(255, 85, 51, 0.3);
+            border-color: rgba(255, 85, 51, 0.35);
             width: auto;
-            padding: 0 15px;
+            padding: 0 16px;
             font-family: 'Orbitron', 'Trebuchet MS', sans-serif;
             font-size: 0.8rem;
             font-weight: 700;
@@ -225,15 +229,16 @@
         }
 
         .transport-btn.btn-record:hover {
-            background: rgba(255, 85, 51, 0.15);
+            background: linear-gradient(135deg, rgba(255, 85, 51, 0.15) 0%, rgba(255, 85, 51, 0.03) 100%);
             border-color: var(--glow-orange);
-            box-shadow: 0 0 10px rgba(255, 85, 51, 0.3);
+            box-shadow: 0 0 15px rgba(255, 85, 51, 0.35), inset 0 1px 1px rgba(255, 85, 51, 0.1);
         }
 
         .transport-btn.btn-record.active {
-            background: rgba(255, 51, 51, 0.15) !important;
+            background: linear-gradient(135deg, rgba(255, 51, 51, 0.2) 0%, rgba(255, 51, 51, 0.05) 100%) !important;
             border-color: #ff3333 !important;
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.5) !important;
+            color: #ff5555 !important;
+            box-shadow: 0 0 18px rgba(255, 51, 51, 0.5), inset 0 1px 1px rgba(255, 51, 51, 0.2) !important;
         }
 
         .transport-btn.btn-record.active #record-icon {
@@ -676,24 +681,58 @@
         }
 
         .btn-action {
-            background: rgba(255,85,51,0.1);
+            background: linear-gradient(135deg, rgba(255,85,51,0.08) 0%, rgba(255,85,51,0.02) 100%);
             color: var(--glow-orange);
-            border: 1px solid rgba(255,85,51,0.3);
+            border: 1px solid rgba(255,85,51,0.25);
             padding: 7px 14px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-family: 'Orbitron', 'Trebuchet MS', sans-serif;
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
         }
 
         .btn-action:hover {
-            background: rgba(255,85,51,0.2);
+            background: linear-gradient(135deg, rgba(255,85,51,0.18) 0%, rgba(255,85,51,0.04) 100%);
             border-color: var(--glow-orange);
-            box-shadow: 0 0 12px rgba(255, 85, 51, 0.3);
-            transform: translateY(-1px);
+            box-shadow: 0 0 14px rgba(255, 85, 51, 0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+            transform: translateY(-1.5px);
+        }
+
+        .btn-action.btn-save {
+            background: linear-gradient(135deg, rgba(57, 231, 95, 0.08) 0%, rgba(57, 231, 95, 0.02) 100%);
+            color: var(--glow-green);
+            border-color: rgba(57, 231, 95, 0.3);
+        }
+        .btn-action.btn-save:hover {
+            background: linear-gradient(135deg, rgba(57, 231, 95, 0.18) 0%, rgba(57, 231, 95, 0.04) 100%);
+            border-color: var(--glow-green);
+            box-shadow: 0 0 14px rgba(57, 231, 95, 0.35);
+        }
+
+        .btn-action.btn-load {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(0, 229, 255, 0.02) 100%);
+            color: var(--glow-cyan);
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+        .btn-action.btn-load:hover {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.18) 0%, rgba(0, 229, 255, 0.04) 100%);
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 14px rgba(0, 229, 255, 0.35);
+        }
+
+        .btn-action.btn-export {
+            background: linear-gradient(135deg, rgba(255, 85, 51, 0.08) 0%, rgba(255, 85, 51, 0.02) 100%);
+            color: var(--glow-orange);
+            border-color: rgba(255, 85, 51, 0.3);
+        }
+        .btn-action.btn-export:hover {
+            background: linear-gradient(135deg, rgba(255, 85, 51, 0.18) 0%, rgba(255, 85, 51, 0.04) 100%);
+            border-color: var(--glow-orange);
+            box-shadow: 0 0 14px rgba(255, 85, 51, 0.35);
         }
 
         /* Seção 2: Step Sequencer (Split Layout) */
@@ -2217,9 +2256,9 @@
 
             <!-- Importar / Exportar Projeto -->
             <div class="project-actions" style="display: flex; gap: 6px; flex-shrink: 0;">
-                <button class="btn-action" id="btn-save-project-header" style="padding: 5px 10px; font-size: 0.7rem; border-color: rgba(0, 230, 118, 0.3); background: rgba(0, 230, 118, 0.05); color: var(--glow-green);">💾 SAVE</button>
-                <button class="btn-action" id="btn-import-project" style="padding: 5px 10px; font-size: 0.7rem; border-color: rgba(0, 229, 255, 0.3); background: rgba(0, 229, 255, 0.05); color: var(--glow-cyan);">📥 LOAD</button>
-                <button class="btn-action" id="btn-export-project" style="padding: 5px 10px; font-size: 0.7rem; border-color: rgba(255, 85, 51, 0.3); background: rgba(255, 85, 51, 0.05); color: var(--glow-orange);">📤 EXPORT</button>
+                <button class="btn-action btn-save" id="btn-save-project-header" style="padding: 5px 12px; font-size: 0.72rem;">💾 SAVE</button>
+                <button class="btn-action btn-load" id="btn-import-project" style="padding: 5px 12px; font-size: 0.72rem;">📥 LOAD</button>
+                <button class="btn-action btn-export" id="btn-export-project" style="padding: 5px 12px; font-size: 0.72rem;">📤 EXPORT</button>
                 <input type="file" id="input-import-project" accept=".json" style="display: none;">
             </div>
         </header>
