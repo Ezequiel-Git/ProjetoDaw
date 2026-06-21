@@ -6218,7 +6218,11 @@
                 key.innerText = note;
                 
                 key.onclick = () => {
+                    initAudioEngine();
                     if (audioCtx) {
+                        if (audioCtx.state === 'suspended') {
+                            audioCtx.resume();
+                        }
                         const freq = noteToFreq(note);
                         triggerChannelSynth(audioCtx, audioCtx.currentTime, freq, chan, mixer[chId] || mixer.master);
                     }
@@ -6254,8 +6258,18 @@
                             cell.classList.add('active');
                             if (isDrumType(chan.type)) {
                                 chan.steps[i] = true;
+                                initAudioEngine();
+                                if (audioCtx) {
+                                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                                    triggerChannelSynth(audioCtx, audioCtx.currentTime, 0, chan, mixer[chId] || mixer.master);
+                                }
                             } else {
                                 chan.steps[i] = note;
+                                initAudioEngine();
+                                if (audioCtx) {
+                                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                                    triggerChannelSynth(audioCtx, audioCtx.currentTime, noteToFreq(note), chan, mixer[chId] || mixer.master);
+                                }
                             }
                         }
                         
@@ -9245,7 +9259,7 @@
             try {
                 const savedSongs = JSON.parse(localStorage.getItem('strudel_songs') || '[]');
                 const defaultSong = savedSongs.find(s => s.name === "Cybernetic Neon Drift");
-                const isCorrupted = !defaultSong || defaultSong.code.length < 500 || !defaultSong.code.includes('loadInstrument');
+                const isCorrupted = !defaultSong || defaultSong.code.length < 300 || (!defaultSong.code.includes('defineSynth') && !defaultSong.code.includes('loadInstrument'));
                 
                 if (isCorrupted) {
                     const response = await fetch(PRESETS_URL);
@@ -9310,7 +9324,7 @@
                 if (recoveryData) {
                     const data = JSON.parse(recoveryData);
                     if (data && data.code) {
-                        const isOldRecovery = data.name === "Musica" || data.name === "Colossus of Rhodes" || data.name === "Colossus of Rhodes PRO (3min - GOW II)" || (!data.code.includes('loadInstrument'));
+                        const isOldRecovery = data.name === "Musica" || data.name === "Colossus of Rhodes" || data.name === "Colossus of Rhodes PRO (3min - GOW II)";
                         if (isOldRecovery) {
                             localStorage.removeItem('strudel_daw_recovery');
                         } else {
