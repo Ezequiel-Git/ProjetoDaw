@@ -7898,6 +7898,16 @@
 
         // --- RENDERIZADOR DE ÁUDIO EM PEDAÇOS (CHUNKED OFFLINE RENDERER) ---
         async function renderAudioInChunks(parsed, totalSteps, stepDuration, totalDuration, sampleRate, onProgress) {
+            // Sincronizar dinamicamente a duração dos clipes de padrão com a duração real dos padrões dos canais
+            playlistClips.forEach(clip => {
+                if (clip.type === 'pattern') {
+                    const chan = channels[clip.id];
+                    if (chan && chan.steps) {
+                        clip.duration = Math.max(1, Math.ceil(chan.steps.length / 16));
+                    }
+                }
+            });
+
             const EXPORT_CHUNK_DURATION = 20.0; // chunks de 20 segundos
             const decayTail = 4.0;
             const numChunks = Math.ceil(totalDuration / EXPORT_CHUNK_DURATION);
@@ -9727,6 +9737,16 @@
 
         // --- PLAYLIST CORE RENDERERS & HELPERS ---
         function renderPlaylist() {
+            // Sincronizar dinamicamente a duração dos clipes de padrão com a duração real dos padrões dos canais
+            playlistClips.forEach(clip => {
+                if (clip.type === 'pattern') {
+                    const chan = channels[clip.id];
+                    if (chan && chan.steps) {
+                        clip.duration = Math.max(1, Math.ceil(chan.steps.length / 16));
+                    }
+                }
+            });
+
             // 1. Render Ruler Bars
             const rulerContainer = document.getElementById('playlist-ruler-bars');
             if (rulerContainer) {
@@ -9818,6 +9838,12 @@
                                     id: playlistSelectedClip.id,
                                     duration: 1
                                 };
+                                if (newClip.type === 'pattern') {
+                                    const chan = channels[newClip.id];
+                                    if (chan && chan.steps) {
+                                        newClip.duration = Math.max(1, Math.ceil(chan.steps.length / 16));
+                                    }
+                                }
                                 if (newClip.type === 'audio' && playlistAudioClips[newClip.id]) {
                                     const bpm = activeParsedCode ? activeParsedCode.bpm : 120;
                                     const barDuration = (60 / bpm) * 4;
