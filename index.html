@@ -1955,6 +1955,204 @@
             }
         }
 
+        /* --- ESTILOS DA PLAYLIST (ARRANJO ESTILO FL STUDIO) --- */
+        .patsong-btn {
+            transition: all 0.2s ease;
+        }
+        .patsong-btn.active {
+            background: var(--glow-orange) !important;
+            color: var(--text-dark) !important;
+            box-shadow: 0 0 8px var(--glow-orange);
+        }
+        .patsong-btn:hover:not(.active) {
+            color: white;
+            background: rgba(255,255,255,0.05) !important;
+        }
+        
+        /* Playlist Container & Panels */
+        .picker-group-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .picker-group-item:hover {
+            border-color: rgba(255,255,255,0.2);
+            color: white;
+            background: rgba(255,255,255,0.05);
+        }
+        .picker-group-item.active-picker {
+            border-color: currentColor;
+            background: rgba(255,255,255,0.04);
+            box-shadow: inset 0 0 8px rgba(255,255,255,0.05);
+        }
+        
+        /* Ruler bar markers */
+        .ruler-bar-num {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            user-select: none;
+        }
+        .ruler-bar-num:hover {
+            background: rgba(255,255,255,0.02);
+            cursor: pointer;
+        }
+        
+        /* Playlist Tracks layout */
+        .playlist-track-row {
+            height: 80px;
+            display: flex;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            position: relative;
+        }
+        
+        .playlist-track-header {
+            width: 120px;
+            flex-shrink: 0;
+            background: #0d0d14;
+            border-right: 2px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8px;
+            box-sizing: border-box;
+            gap: 4px;
+            user-select: none;
+            z-index: 2;
+        }
+        
+        .playlist-track-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .playlist-track-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .playlist-track-btn {
+            background: #1b1b24;
+            border: 1px solid rgba(255,255,255,0.05);
+            color: var(--text-secondary);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.55rem;
+            font-weight: 800;
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .playlist-track-btn.active-mute {
+            background: var(--glow-yellow) !important;
+            color: var(--text-dark) !important;
+            box-shadow: 0 0 5px var(--glow-yellow);
+        }
+        .playlist-track-btn.active-solo {
+            background: var(--glow-green) !important;
+            color: var(--text-dark) !important;
+            box-shadow: 0 0 5px var(--glow-green);
+        }
+        
+        .playlist-track-lane {
+            display: flex;
+            flex: 1;
+            position: relative;
+            background-image: linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: calc(100% / 32) 100%; /* 32 bars grid */
+        }
+        
+        /* Clip style in the grid */
+        .playlist-clip {
+            position: absolute;
+            height: 70px;
+            top: 5px;
+            border-radius: 6px;
+            box-sizing: border-box;
+            padding: 4px 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: move;
+            z-index: 3;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 1px rgba(255,255,255,0.15);
+            overflow: hidden;
+            user-select: none;
+            transition: border-color 0.2s;
+        }
+        
+        .playlist-clip.clip-pattern {
+            background: linear-gradient(135deg, rgba(255, 85, 51, 0.22) 0%, rgba(255, 119, 85, 0.15) 100%);
+            border: 1px solid var(--glow-orange);
+            color: var(--glow-orange);
+        }
+        .playlist-clip.clip-audio {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.22) 0%, rgba(0, 180, 255, 0.15) 100%);
+            border: 1px solid var(--glow-cyan);
+            color: var(--glow-cyan);
+        }
+        .playlist-clip.clip-automation {
+            background: linear-gradient(135deg, rgba(57, 231, 95, 0.22) 0%, rgba(56, 239, 125, 0.15) 100%);
+            border: 1px solid var(--glow-green);
+            color: var(--glow-green);
+        }
+        
+        .playlist-clip-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+        
+        .playlist-clip-preview-canvas {
+            width: 100%;
+            height: 40px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+        
+        /* Grid snapping visual guidelines */
+        .playlist-track-lane::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, calc(100% / 32) 100%;
+            pointer-events: none;
+        }
+
     </style>
 </head>
 <body>
@@ -1970,6 +2168,12 @@
 
             <!-- Controles do Player -->
             <div class="transport-controls" style="display: flex; align-items: center; gap: 8px;">
+                <!-- PAT/SONG Selector -->
+                <div class="patsong-selector" style="display: flex; background: #08080a; padding: 2px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); gap: 2px;">
+                    <button id="btn-mode-pat" class="patsong-btn active" style="background: var(--glow-orange); color: var(--text-dark); border: none; font-family: 'Orbitron', sans-serif; font-size: 0.65rem; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-weight: 900; transition: all 0.2s; box-shadow: 0 0 8px var(--glow-orange);">PAT</button>
+                    <button id="btn-mode-song" class="patsong-btn" style="background: transparent; color: var(--text-secondary); border: none; font-family: 'Orbitron', sans-serif; font-size: 0.65rem; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-weight: 700; transition: all 0.2s;">SONG</button>
+                </div>
+
                 <button class="transport-btn btn-play" id="btn-play" title="TOCAR (Ctrl+Enter)">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 </button>
@@ -2062,6 +2266,7 @@
                     <button class="workspace-tab-btn active" id="wtab-editor">📝 EDITOR DE CÓDIGO</button>
                     <button class="workspace-tab-btn" id="wtab-sequencer">🎛️ CHANNEL RACK (PASSOS)</button>
                     <button class="workspace-tab-btn" id="wtab-pianoroll">🎹 PIANO ROLL (MELODIA)</button>
+                    <button class="workspace-tab-btn" id="wtab-playlist">🎵 PLAYLIST (ARRANJO)</button>
                     <button class="workspace-tab-btn" id="wtab-mixer">📊 MIXER & VISUALIZADOR</button>
                 </div>
 
@@ -2286,6 +2491,86 @@
                                     <div id="piano-playhead-line" style="position: absolute; top: 0; bottom: 0; width: 2px; background: white; box-shadow: 0 0 8px white; z-index: 3; pointer-events: none; left: -100px; transition: left 0.05s linear;"></div>
                                     <div id="piano-grid-container" style="display: flex; flex-direction: column;">
                                         <!-- JS content -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Conteúdo Aba: Playlist (Arranjo) -->
+                <section class="workspace-content" id="wcontent-playlist" style="display: none; padding: 20px; flex-direction: column; gap: 15px; overflow: hidden; height: calc(100vh - 120px);">
+                    <div class="playlist-container" style="display: grid; grid-template-columns: 240px 1fr; gap: 20px; height: 100%; min-height: 0;">
+                        <!-- Coluna Esquerda: Picker Panel (Clipes) -->
+                        <div class="picker-panel" style="background: var(--panel-bg); border: 1px solid var(--border-daw); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                            <div class="card-header" style="padding: 10px 15px;">
+                                <div class="card-title">CLIP PICKER</div>
+                            </div>
+                            <div style="flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 15px;">
+                                <!-- Seção Patterns -->
+                                <div>
+                                    <h4 style="margin: 0 0 8px 0; font-family:'Orbitron', sans-serif; font-size: 0.75rem; color: var(--glow-orange); text-transform: uppercase; letter-spacing: 1.2px;">Padrões (Patterns)</h4>
+                                    <div class="picker-group" id="picker-patterns" style="display: flex; flex-direction: column; gap: 6px;">
+                                        <!-- Carregado via JS -->
+                                    </div>
+                                </div>
+                                <!-- Seção Audio Clips -->
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <h4 style="margin: 0; font-family:'Orbitron', sans-serif; font-size: 0.75rem; color: var(--glow-cyan); text-transform: uppercase; letter-spacing: 1.2px;">Áudio Clips</h4>
+                                        <div style="display: flex; gap: 4px;">
+                                            <button id="btn-playlist-record" title="Gravar do Microfone" style="background: rgba(255,0,127,0.15); border: 1px solid var(--glow-magenta); color: var(--glow-magenta); font-family:'Orbitron', sans-serif; font-size:0.6rem; padding: 2px 4px; border-radius: 4px; cursor: pointer; font-weight: bold;">🎙️ REC</button>
+                                            <button id="btn-playlist-upload" title="Fazer Upload de arquivo" style="background: rgba(0,229,255,0.15); border: 1px solid var(--glow-cyan); color: var(--glow-cyan); font-family:'Orbitron', sans-serif; font-size:0.6rem; padding: 2px 4px; border-radius: 4px; cursor: pointer; font-weight: bold;">📤 ADD</button>
+                                            <input type="file" id="playlist-audio-upload-input" accept="audio/*" style="display: none;">
+                                        </div>
+                                    </div>
+                                    <div class="picker-group" id="picker-audio" style="display: flex; flex-direction: column; gap: 6px;">
+                                        <!-- Carregado via JS -->
+                                    </div>
+                                </div>
+                                <!-- Seção Automations -->
+                                <div>
+                                    <h4 style="margin: 0 0 8px 0; font-family:'Orbitron', sans-serif; font-size: 0.75rem; color: var(--glow-green); text-transform: uppercase; letter-spacing: 1.2px;">Automações</h4>
+                                    <div class="picker-group" id="picker-automations" style="display: flex; flex-direction: column; gap: 6px;">
+                                        <!-- Carregado via JS -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Coluna Direita: Linha do tempo -->
+                        <div class="playlist-timeline" style="background: var(--panel-bg); border: 1px solid var(--border-daw); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                            <!-- Top Toolbar -->
+                            <div class="card-header" style="padding: 8px 15px; display: flex; justify-content: space-between; align-items: center;">
+                                <div class="card-title">PLAYLIST TRACKS & ARRANGEMENT</div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <!-- Tool selector -->
+                                    <div style="display: flex; background: #111116; border: 1px solid rgba(255,255,255,0.06); padding: 2px; border-radius: 6px;">
+                                        <button id="btn-pltool-draw" class="transport-btn active" title="Lápis (Pintar Clipes)" style="width: 28px; height: 28px; font-size: 0.8rem; border: none; background: transparent; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center;">✏️</button>
+                                        <button id="btn-pltool-erase" class="transport-btn" title="Borracha (Apagar Clipes)" style="width: 28px; height: 28px; font-size: 0.8rem; border: none; background: transparent; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center;">🧹</button>
+                                    </div>
+                                    <span style="font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-secondary);">Grid Snap: Compasso (Bar)</span>
+                                </div>
+                            </div>
+
+                            <!-- Scrollable Workspace containing Timeline Grid -->
+                            <div class="playlist-scroll-container" style="flex: 1; overflow: auto; background: #07070c; position: relative;">
+                                <div class="playlist-grid-wrapper" style="width: max-content; min-width: 100%; display: flex; flex-direction: column;">
+                                    
+                                    <!-- Timeline Ruler -->
+                                    <div class="playlist-ruler" id="playlist-timeline-ruler" style="height: 30px; display: flex; border-bottom: 2px solid rgba(255,255,255,0.08); background: #0a0a0f; position: sticky; top: 0; z-index: 5;">
+                                        <div style="width: 120px; flex-shrink: 0; border-right: 2px solid rgba(255,255,255,0.08); background: #0c0c12;"></div>
+                                        <div id="playlist-ruler-bars" style="display: flex; flex: 1;">
+                                            <!-- Carregado via JS -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Tracks rows -->
+                                    <div class="playlist-tracks" id="playlist-tracks-container" style="display: flex; flex-direction: column; position: relative;">
+                                        <!-- Playhead Line -->
+                                        <div id="playlist-playhead" style="position: absolute; top: 0; bottom: 0; left: 120px; width: 2px; background: #ff0055; box-shadow: 0 0 8px #ff0055; pointer-events: none; z-index: 4; transition: left 0.1s linear;"></div>
+                                        
+                                        <!-- Tracks carregadas via JS -->
                                     </div>
                                 </div>
                             </div>
@@ -2542,6 +2827,21 @@
             "synth_bell": { name: "🎹 Sino Metálico", type: "triangle", settings: { oscType: "triangle", attack: 0.01, decay: 0.6, sustain: 0.1, release: 0.5, cutoff: 1200, resonance: 2.0, delayMix: 0.4, delayTime: 0.3, pitch: 0 } }
         };
 
+        // --- PLAYLIST STATE VARIABLES ---
+        let playMode = 'pat'; // 'pat' or 'song'
+        let playlistTool = 'draw'; // 'draw' or 'erase'
+        let playlistSelectedClip = { type: 'pattern', id: 'lead' };
+        let playlistClips = []; // list of clips
+        let playlistAudioClips = {}; // id -> { name, buffer }
+        let playlistAutomations = {
+            'lead_vol': { name: 'LEAD Vol', target: 'lead', param: 'volume', points: [{x: 0, y: 0.8}, {x: 1, y: 0.8}] },
+            'bass_cutoff': { name: 'BASS Cutoff', target: 'bass', param: 'cutoff', points: [{x: 0, y: 700}, {x: 1, y: 700}] }
+        };
+        let playlistTracksCount = 6;
+        let playlistBarsCount = 32;
+        let playlistMediaRecorder = null;
+        let playlistRecordedChunks = [];
+
         // --- CANAIS DINÂMICOS (ESTADO DA DAW COM SYNTHS VIRTUAIS/PLUGINS) ---
         let sequencerSteps = 16;
         let channels = {
@@ -2606,17 +2906,17 @@
             
             let synth;
             if (cleanType === 'fmsynth' || cleanType === 'fm') {
-                synth = new Tone.FMSynth();
+                synth = new Tone.PolySynth(Tone.FMSynth);
             } else if (cleanType === 'amsynth' || cleanType === 'am') {
-                synth = new Tone.AMSynth();
+                synth = new Tone.PolySynth(Tone.AMSynth);
             } else if (cleanType === 'duosynth' || cleanType === 'duo') {
-                synth = new Tone.DuoSynth();
+                synth = new Tone.PolySynth(Tone.DuoSynth);
             } else if (cleanType === 'metalsynth' || cleanType === 'metal') {
-                synth = new Tone.MetalSynth();
+                synth = new Tone.PolySynth(Tone.MetalSynth);
             } else if (cleanType === 'membranesynth' || cleanType === 'membrane') {
-                synth = new Tone.MembraneSynth();
+                synth = new Tone.PolySynth(Tone.MembraneSynth);
             } else {
-                synth = new Tone.Synth();
+                synth = new Tone.PolySynth(Tone.Synth);
             }
             
             synth.connect(destNode);
@@ -2836,6 +3136,23 @@
             const baseFreq = noteFrequencies[note];
             if (!baseFreq) return 0;
             return baseFreq * Math.pow(2, octave);
+        }
+
+        const noteMidiOffsets = {
+            'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4,
+            'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9,
+            'A#': 10, 'Bb': 10, 'B': 11
+        };
+
+        function noteToMidi(noteStr) {
+            if (typeof noteStr !== 'string') return 0;
+            const match = noteStr.match(/^([A-G]#?|D[b#]|E[b]|G[b]|A[b]|B[b])(\d)$/i);
+            if (!match) return 0;
+            const note = match[1].toUpperCase();
+            const octave = parseInt(match[2]);
+            const offset = noteMidiOffsets[note];
+            if (offset === undefined) return 0;
+            return 12 + octave * 12 + offset;
         }
 
         // --- FUNÇÕES DE SISTEMA (ALERTAS E DIAGNÓSTICOS) ---
@@ -3537,6 +3854,18 @@
                 const selectedType = ['fm', 'fmsynth', 'am', 'amsynth', 'duo', 'duosynth', 'metal', 'metalsynth', 'membrane', 'membranesynth'].includes(instNameLower) ? instNameLower : toneType;
                 const synth = getToneSynth(channelState.id, selectedType, destNode);
                 if (synth) {
+                    try {
+                        synth.set({
+                            envelope: {
+                                attack: s.attack,
+                                decay: s.decay,
+                                sustain: s.sustain,
+                                release: s.release
+                            }
+                        });
+                    } catch (e) {
+                        // Safe fallback for synths that don't have standard envelopes (e.g. MetalSynth)
+                    }
                     synth.triggerAttackRelease(shiftedFreq, baseDuration, adjustedTime, adjustedVolume * 1.5);
                     return;
                 }
@@ -5764,46 +6093,123 @@
         function scheduleNote(stepNumber, time) {
             if (!activeParsedCode) return;
             
-            const anySolo = Object.values(channels).some(c => c.solo);
-            Object.keys(activeParsedCode).forEach(chId => {
-                if (chId === 'bpm') return;
-                
-                const chanState = channels[chId];
-                if (!chanState) return;
+            // Sincronizar o visualStep exatamente no tempo que a nota vai tocar
+            const timeUntilPlay = (time - audioCtx.currentTime) * 1000;
+            setTimeout(() => {
+                visualStep = stepNumber;
+                updatePlaylistPlayhead();
+            }, Math.max(0, timeUntilPlay));
 
-                const isMuted = chanState.mute || false;
-                const isSoloed = chanState.solo || false;
-                const shouldPlay = anySolo ? isSoloed : !isMuted;
-                
-                // Sincronizar o visualStep exatamente no tempo que a nota vai tocar
-                const timeUntilPlay = (time - audioCtx.currentTime) * 1000;
-                setTimeout(() => {
-                    visualStep = stepNumber;
-                }, Math.max(0, timeUntilPlay));
+            const bar = Math.floor(stepNumber / 16);
+            const stepIdxInBar = stepNumber % 16;
+            
+            // Verificar solos na playlist
+            let anyTrackSoloed = false;
+            if (window.playlistTrackStates) {
+                anyTrackSoloed = Object.values(window.playlistTrackStates).some(s => s.solo);
+            }
 
-                if (!shouldPlay) return;
+            if (playMode === 'song') {
+                // SONG MODE: Tocar clipes da Playlist
+                playlistClips.forEach(clip => {
+                    const trackState = window.playlistTrackStates ? window.playlistTrackStates[clip.track] : null;
+                    const isMuted = trackState ? trackState.mute : false;
+                    const isSoloed = trackState ? trackState.solo : false;
+                    const shouldPlay = anyTrackSoloed ? isSoloed : !isMuted;
+                    
+                    if (!shouldPlay) return;
 
-                const stepsArr = activeParsedCode[chId];
-                if (stepsArr) {
-                    const stepIdx = stepNumber % stepsArr.length;
-                    const stepVal = stepsArr[stepIdx];
-                    if (stepVal) {
-                        if (mixer[chId]) {
-                            if (isDrumType(chanState.type)) {
-                                triggerChannelSynth(audioCtx, time, 0, chanState, mixer[chId]);
-                            } else if (typeof stepVal === 'string') {
-                                const notes = stepVal.split('+');
-                                notes.forEach(n => {
-                                    const freq = noteToFreq(n.trim());
-                                    if (freq > 0) {
-                                        triggerChannelSynth(audioCtx, time, freq, chanState, mixer[chId]);
+                    // Se o clipe está ativo neste compasso
+                    if (bar >= clip.bar && bar < (clip.bar + clip.duration)) {
+                        if (clip.type === 'pattern') {
+                            const chId = clip.id;
+                            const chanState = channels[chId];
+                            if (chanState) {
+                                const stepsArr = chanState.steps;
+                                if (stepsArr && stepsArr.length > 0) {
+                                    const stepIdx = stepNumber % stepsArr.length;
+                                    const stepVal = stepsArr[stepIdx];
+                                    if (stepVal) {
+                                        if (mixer[chId]) {
+                                            if (isDrumType(chanState.type)) {
+                                                triggerChannelSynth(audioCtx, time, 0, chanState, mixer[chId]);
+                                            } else if (typeof stepVal === 'string') {
+                                                const notes = stepVal.split('+');
+                                                notes.forEach(n => {
+                                                    const freq = noteToFreq(n.trim());
+                                                    if (freq > 0) {
+                                                        triggerChannelSynth(audioCtx, time, freq, chanState, mixer[chId]);
+                                                    }
+                                                });
+                                            }
+                                        }
                                     }
-                                });
+                                }
+                            }
+                        } else if (clip.type === 'audio') {
+                            // Clipes de áudio iniciam no começo do primeiro compasso dele
+                            if (bar === clip.bar && stepIdxInBar === 0) {
+                                const audioData = playlistAudioClips[clip.id];
+                                if (audioData && audioData.buffer && audioCtx) {
+                                    const source = audioCtx.createBufferSource();
+                                    source.buffer = audioData.buffer;
+                                    source.connect(mixer.master);
+                                    source.start(time);
+                                }
+                            }
+                        } else if (clip.type === 'automation') {
+                            // Automação simples: modula o volume do canal de 100% no início do compasso para 0% no final
+                            const autoData = playlistAutomations[clip.id];
+                            if (autoData) {
+                                const ratio = stepIdxInBar / 15; // 0 a 1
+                                let val = 0.8;
+                                if (clip.id === 'lead_vol') {
+                                    val = 0.8 * (1.0 - ratio); // Fade out linear
+                                } else {
+                                    val = 0.8 * ratio; // Fade in linear
+                                }
+                                updateChannelVolume(autoData.target, val);
                             }
                         }
                     }
-                }
-            });
+                });
+            } else {
+                // PATTERN MODE: Tocar em loop o canal ativo
+                const anySolo = Object.values(channels).some(c => c.solo);
+                Object.keys(activeParsedCode).forEach(chId => {
+                    if (chId === 'bpm') return;
+                    
+                    const chanState = channels[chId];
+                    if (!chanState) return;
+
+                    const isMuted = chanState.mute || false;
+                    const isSoloed = chanState.solo || false;
+                    const shouldPlay = anySolo ? isSoloed : !isMuted;
+                    
+                    if (!shouldPlay) return;
+
+                    const stepsArr = activeParsedCode[chId];
+                    if (stepsArr) {
+                        const stepIdx = stepNumber % stepsArr.length;
+                        const stepVal = stepsArr[stepIdx];
+                        if (stepVal) {
+                            if (mixer[chId]) {
+                                if (isDrumType(chanState.type)) {
+                                    triggerChannelSynth(audioCtx, time, 0, chanState, mixer[chId]);
+                                } else if (typeof stepVal === 'string') {
+                                    const notes = stepVal.split('+');
+                                    notes.forEach(n => {
+                                        const freq = noteToFreq(n.trim());
+                                        if (freq > 0) {
+                                            triggerChannelSynth(audioCtx, time, freq, chanState, mixer[chId]);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         }
 
         function scheduler() {
@@ -5823,14 +6229,18 @@
                 nextNoteTime += stepDuration;
                 
                 let maxSteps = 16;
-                if (activeParsedCode) {
-                    Object.keys(activeParsedCode).forEach(chId => {
-                        if (chId === 'bpm') return;
-                        const arr = activeParsedCode[chId];
-                        if (arr && arr.length > maxSteps) {
-                            maxSteps = arr.length;
-                        }
-                    });
+                if (playMode === 'song') {
+                    maxSteps = playlistBarsCount * 16;
+                } else {
+                    if (activeParsedCode) {
+                        Object.keys(activeParsedCode).forEach(chId => {
+                            if (chId === 'bpm') return;
+                            const arr = activeParsedCode[chId];
+                            if (arr && arr.length > maxSteps) {
+                                maxSteps = arr.length;
+                            }
+                        });
+                    }
                 }
                 currentStep = (currentStep + 1) % maxSteps;
             }
@@ -7513,22 +7923,106 @@
                 for (let step = 0; step < totalSteps; step++) {
                     const time = step * stepDuration;
                     if (time >= chunkStartTime && time < chunkEndTime) {
-                        Object.keys(parsed).forEach(chId => {
-                            if (chId === 'bpm') return;
-                            const stepsArr = parsed[chId];
-                            if (stepsArr) {
-                                const stepIdx = step % stepsArr.length;
-                                if (stepsArr[stepIdx]) {
-                                    const chanState = channels[chId];
-                                    if (chanState && offlineMixer[chId]) {
-                                        const freq = isDrumType(chanState.type)
-                                            ? 0 : noteToFreq(stepsArr[stepIdx]);
-                                        
-                                        triggerChannelSynth(offlineCtx, time - chunkStartTime, freq, chanState, offlineMixer[chId]);
+                        if (playMode === 'song') {
+                            // SONG MODE offline schedule
+                            let anyTrackSoloed = false;
+                            if (window.playlistTrackStates) {
+                                anyTrackSoloed = Object.values(window.playlistTrackStates).some(s => s.solo);
+                            }
+                            const bar = Math.floor(step / 16);
+                            const stepIdxInBar = step % 16;
+
+                            playlistClips.forEach(clip => {
+                                const trackState = window.playlistTrackStates ? window.playlistTrackStates[clip.track] : null;
+                                const isMuted = trackState ? trackState.mute : false;
+                                const isSoloed = trackState ? trackState.solo : false;
+                                const shouldPlay = anyTrackSoloed ? isSoloed : !isMuted;
+                                
+                                if (!shouldPlay) return;
+
+                                // Se o clipe está ativo neste compasso
+                                if (bar >= clip.bar && bar < (clip.bar + clip.duration)) {
+                                    if (clip.type === 'pattern') {
+                                        const chId = clip.id;
+                                        const chanState = channels[chId];
+                                        if (chanState && offlineMixer[chId]) {
+                                            const stepsArr = chanState.steps;
+                                            if (stepsArr && stepsArr.length > 0) {
+                                                const stepIdx = step % stepsArr.length;
+                                                const stepVal = stepsArr[stepIdx];
+                                                if (stepVal) {
+                                                    if (isDrumType(chanState.type)) {
+                                                        triggerChannelSynth(offlineCtx, time - chunkStartTime, 0, chanState, offlineMixer[chId]);
+                                                    } else if (typeof stepVal === 'string') {
+                                                        const notes = stepVal.split('+');
+                                                        notes.forEach(n => {
+                                                            const freq = noteToFreq(n.trim());
+                                                            if (freq > 0) {
+                                                                triggerChannelSynth(offlineCtx, time - chunkStartTime, freq, chanState, offlineMixer[chId]);
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else if (clip.type === 'audio') {
+                                        if (bar === clip.bar && stepIdxInBar === 0) {
+                                            const audioData = playlistAudioClips[clip.id];
+                                            if (audioData && audioData.buffer) {
+                                                const source = offlineCtx.createBufferSource();
+                                                source.buffer = audioData.buffer;
+                                                source.connect(offlineMixer.master);
+                                                source.start(time - chunkStartTime);
+                                            }
+                                        }
+                                    } else if (clip.type === 'automation') {
+                                        const autoData = playlistAutomations[clip.id];
+                                        if (autoData) {
+                                            const ratio = stepIdxInBar / 15;
+                                            let val = 0.8;
+                                            if (clip.id === 'lead_vol') {
+                                                val = 0.8 * (1.0 - ratio);
+                                            } else {
+                                                val = 0.8 * ratio;
+                                            }
+                                            if (offlineMixer[autoData.target]) {
+                                                offlineMixer[autoData.target].gain.setValueAtTime(val, time - chunkStartTime);
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            // PATTERN MODE offline schedule (original loop)
+                            Object.keys(parsed).forEach(chId => {
+                                if (chId === 'bpm') return;
+                                const stepsArr = parsed[chId];
+                                if (stepsArr) {
+                                    const stepIdx = step % stepsArr.length;
+                                    if (stepsArr[stepIdx]) {
+                                        const chanState = channels[chId];
+                                        if (chanState && offlineMixer[chId]) {
+                                            if (isDrumType(chanState.type)) {
+                                                triggerChannelSynth(offlineCtx, time - chunkStartTime, 0, chanState, offlineMixer[chId]);
+                                            } else if (typeof stepsArr[stepIdx] === 'string') {
+                                                const notes = stepsArr[stepIdx].split('+');
+                                                notes.forEach(n => {
+                                                    const freq = noteToFreq(n.trim());
+                                                    if (freq > 0) {
+                                                        triggerChannelSynth(offlineCtx, time - chunkStartTime, freq, chanState, offlineMixer[chId]);
+                                                    }
+                                                });
+                                            } else {
+                                                const freq = stepsArr[stepIdx] === true ? 0 : noteToFreq(stepsArr[stepIdx]);
+                                                if (freq > 0) {
+                                                    triggerChannelSynth(offlineCtx, time - chunkStartTime, freq, chanState, offlineMixer[chId]);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
                     }
                 }
 
@@ -7678,13 +8172,17 @@
                 const stepDuration = 60.0 / bpm / 4;
                 
                 let maxLen = 16;
-                Object.keys(parsed).forEach(chId => {
-                    if (chId === 'bpm') return;
-                    const arr = parsed[chId];
-                    if (arr && arr.length > maxLen) {
-                        maxLen = arr.length;
-                    }
-                });
+                if (playMode === 'song') {
+                    maxLen = playlistBarsCount * 16;
+                } else {
+                    Object.keys(parsed).forEach(chId => {
+                        if (chId === 'bpm') return;
+                        const arr = parsed[chId];
+                        if (arr && arr.length > maxLen) {
+                            maxLen = arr.length;
+                        }
+                    });
+                }
 
                 const cyclesVal = document.getElementById('export-cycles').value;
                 let totalSteps = maxLen;
@@ -7838,13 +8336,17 @@
                 const stepDuration = 60.0 / bpm / 4;
                 
                 let maxLen = 16;
-                Object.keys(parsed).forEach(chId => {
-                    if (chId === 'bpm') return;
-                    const arr = parsed[chId];
-                    if (arr && arr.length > maxLen) {
-                        maxLen = arr.length;
-                    }
-                });
+                if (playMode === 'song') {
+                    maxLen = playlistBarsCount * 16;
+                } else {
+                    Object.keys(parsed).forEach(chId => {
+                        if (chId === 'bpm') return;
+                        const arr = parsed[chId];
+                        if (arr && arr.length > maxLen) {
+                            maxLen = arr.length;
+                        }
+                    });
+                }
 
                 const cyclesVal = document.getElementById('export-cycles').value;
                 let totalSteps = maxLen;
@@ -8813,12 +9315,13 @@
 
         // Navegação de Tabs do Workspace (Editor de Código vs Channel Rack vs Mixer)
         function switchWorkspaceTab(tabId) {
-            const tabs = ['wtab-editor', 'wtab-sequencer', 'wtab-mixer', 'wtab-pianoroll'];
+            const tabs = ['wtab-editor', 'wtab-sequencer', 'wtab-mixer', 'wtab-pianoroll', 'wtab-playlist'];
             const contents = {
                 'wtab-editor': 'wcontent-editor',
                 'wtab-sequencer': 'wcontent-sequencer',
                 'wtab-mixer': 'wcontent-mixer',
-                'wtab-pianoroll': 'wcontent-pianoroll'
+                'wtab-pianoroll': 'wcontent-pianoroll',
+                'wtab-playlist': 'wcontent-playlist'
             };
             
             const pluginPanel = document.getElementById('plugin-panel');
@@ -8838,7 +9341,11 @@
                 if (btn && content) {
                     if (id === tabId) {
                         btn.classList.add('active');
-                        content.style.display = (id === 'wtab-editor') ? 'flex' : 'block';
+                        if (id === 'wtab-editor' || id === 'wtab-playlist') {
+                            content.style.display = 'flex';
+                        } else {
+                            content.style.display = 'block';
+                        }
                     } else {
                         btn.classList.remove('active');
                         content.style.display = 'none';
@@ -8853,12 +9360,16 @@
                 updatepianoRollChannelSelect();
                 renderpianoRoll();
             }
+            if (tabId === 'wtab-playlist') {
+                renderPlaylist();
+            }
         }
 
         document.getElementById('wtab-editor').onclick = () => switchWorkspaceTab('wtab-editor');
         document.getElementById('wtab-sequencer').onclick = () => switchWorkspaceTab('wtab-sequencer');
         document.getElementById('wtab-mixer').onclick = () => switchWorkspaceTab('wtab-mixer');
         document.getElementById('wtab-pianoroll').onclick = () => switchWorkspaceTab('wtab-pianoroll');
+        document.getElementById('wtab-playlist').onclick = () => switchWorkspaceTab('wtab-playlist');
 
         // Sistema de abas para o editor de código: Nova JS vs Antiga Declarativa
         function setEditorTabMode(mode) {
@@ -9084,6 +9595,445 @@
             });
         }
 
+        // --- PLAYLIST CORE RENDERERS & HELPERS ---
+        function renderPlaylist() {
+            // 1. Render Ruler Bars
+            const rulerContainer = document.getElementById('playlist-ruler-bars');
+            if (rulerContainer) {
+                rulerContainer.innerHTML = '';
+                for (let bar = 0; bar < playlistBarsCount; bar++) {
+                    const barDiv = document.createElement('div');
+                    barDiv.className = 'ruler-bar-num';
+                    barDiv.innerText = `${bar + 1}`;
+                    barDiv.onclick = () => {
+                        if (audioCtx) {
+                            currentStep = bar * 16;
+                            nextNoteTime = audioCtx.currentTime;
+                            updatePlaylistPlayhead();
+                        }
+                    };
+                    rulerContainer.appendChild(barDiv);
+                }
+            }
+
+            // 2. Render Picker Panel
+            renderPlaylistPicker();
+
+            // 3. Render Tracks lanes
+            const tracksContainer = document.getElementById('playlist-tracks-container');
+            if (tracksContainer) {
+                const playhead = document.getElementById('playlist-playhead');
+                tracksContainer.innerHTML = '';
+                if (playhead) tracksContainer.appendChild(playhead);
+
+                for (let track = 0; track < playlistTracksCount; track++) {
+                    const trackRow = document.createElement('div');
+                    trackRow.className = 'playlist-track-row';
+
+                    // Track Header
+                    const header = document.createElement('div');
+                    header.className = 'playlist-track-header';
+                    header.innerHTML = `
+                        <div class="playlist-track-name">Track ${track + 1}</div>
+                        <div class="playlist-track-controls">
+                            <button class="playlist-track-btn" id="pl-mute-${track}" title="Silenciar">M</button>
+                            <button class="playlist-track-btn" id="pl-solo-${track}" title="Solo">S</button>
+                        </div>
+                    `;
+                    
+                    const muteBtn = header.querySelector(`#pl-mute-${track}`);
+                    const soloBtn = header.querySelector(`#pl-solo-${track}`);
+                    
+                    if (!window.playlistTrackStates) window.playlistTrackStates = {};
+                    if (!window.playlistTrackStates[track]) window.playlistTrackStates[track] = { mute: false, solo: false };
+                    
+                    const state = window.playlistTrackStates[track];
+                    if (state.mute) muteBtn.classList.add('active-mute');
+                    if (state.solo) soloBtn.classList.add('active-solo');
+
+                    muteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        state.mute = !state.mute;
+                        muteBtn.classList.toggle('active-mute', state.mute);
+                        showToast(`Track ${track + 1} ${state.mute ? 'silenciada' : 'ativada'}`);
+                    };
+
+                    soloBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        state.solo = !state.solo;
+                        soloBtn.classList.toggle('active-solo', state.solo);
+                        showToast(`Track ${track + 1} solo ${state.solo ? 'ativado' : 'desativado'}`);
+                    };
+
+                    trackRow.appendChild(header);
+
+                    // Track Lane
+                    const lane = document.createElement('div');
+                    lane.className = 'playlist-track-lane';
+                    
+                    lane.onclick = (e) => {
+                        if (e.target !== lane) return;
+                        const rect = lane.getBoundingClientRect();
+                        const clickX = e.clientX - rect.left;
+                        const barWidth = rect.width / playlistBarsCount;
+                        const clickedBar = Math.floor(clickX / barWidth);
+
+                        if (playlistTool === 'draw') {
+                            const existing = playlistClips.find(c => c.track === track && c.bar === clickedBar);
+                            if (!existing) {
+                                const newClip = {
+                                    track: track,
+                                    bar: clickedBar,
+                                    type: playlistSelectedClip.type,
+                                    id: playlistSelectedClip.id,
+                                    duration: 1
+                                };
+                                if (newClip.type === 'audio' && playlistAudioClips[newClip.id]) {
+                                    const bpm = activeParsedCode ? activeParsedCode.bpm : 120;
+                                    const barDuration = (60 / bpm) * 4;
+                                    const clipDurationSec = playlistAudioClips[newClip.id].buffer.duration;
+                                    newClip.duration = Math.max(1, Math.round(clipDurationSec / barDuration));
+                                }
+                                playlistClips.push(newClip);
+                                renderPlaylist();
+                            }
+                        }
+                    };
+
+                    trackRow.appendChild(lane);
+                    tracksContainer.appendChild(trackRow);
+                }
+
+                // 4. Render Clipes colocados
+                renderPlaylistClips();
+            }
+            updatePlaylistPlayhead();
+        }
+
+        function renderPlaylistPicker() {
+            // Patterns
+            const patternsContainer = document.getElementById('picker-patterns');
+            if (patternsContainer) {
+                patternsContainer.innerHTML = '';
+                Object.keys(channels).forEach(chId => {
+                    const item = document.createElement('div');
+                    item.className = 'picker-group-item';
+                    if (playlistSelectedClip.type === 'pattern' && playlistSelectedClip.id === chId) {
+                        item.classList.add('active-picker');
+                        item.style.color = 'var(--glow-orange)';
+                    }
+                    item.innerHTML = `<span>🎹 ${chId.toUpperCase()}</span>`;
+                    item.onclick = () => {
+                        playlistSelectedClip = { type: 'pattern', id: chId };
+                        renderPlaylistPicker();
+                    };
+                    patternsContainer.appendChild(item);
+                });
+            }
+
+            // Audio Clips
+            const audioContainer = document.getElementById('picker-audio');
+            if (audioContainer) {
+                audioContainer.innerHTML = '';
+                Object.keys(playlistAudioClips).forEach(clipId => {
+                    const item = document.createElement('div');
+                    item.className = 'picker-group-item';
+                    if (playlistSelectedClip.type === 'audio' && playlistSelectedClip.id === clipId) {
+                        item.classList.add('active-picker');
+                        item.style.color = 'var(--glow-cyan)';
+                    }
+                    item.innerHTML = `<span>🎵 ${playlistAudioClips[clipId].name}</span>`;
+                    item.onclick = () => {
+                        playlistSelectedClip = { type: 'audio', id: clipId };
+                        renderPlaylistPicker();
+                    };
+                    audioContainer.appendChild(item);
+                });
+                if (Object.keys(playlistAudioClips).length === 0) {
+                    audioContainer.innerHTML = `<span style="font-size:0.7rem; color:var(--text-secondary); text-align:center;">Nenhum clipe carregado</span>`;
+                }
+            }
+
+            // Automations
+            const automationsContainer = document.getElementById('picker-automations');
+            if (automationsContainer) {
+                automationsContainer.innerHTML = '';
+                Object.keys(playlistAutomations).forEach(autoId => {
+                    const item = document.createElement('div');
+                    item.className = 'picker-group-item';
+                    if (playlistSelectedClip.type === 'automation' && playlistSelectedClip.id === autoId) {
+                        item.classList.add('active-picker');
+                        item.style.color = 'var(--glow-green)';
+                    }
+                    item.innerHTML = `<span>📈 ${playlistAutomations[autoId].name}</span>`;
+                    item.onclick = () => {
+                        playlistSelectedClip = { type: 'automation', id: autoId };
+                        renderPlaylistPicker();
+                    };
+                    automationsContainer.appendChild(item);
+                });
+            }
+        }
+
+        function renderPlaylistClips() {
+            const trackRows = document.querySelectorAll('.playlist-track-row');
+            trackRows.forEach(row => {
+                const lane = row.querySelector('.playlist-track-lane');
+                if (lane) {
+                    const clips = lane.querySelectorAll('.playlist-clip');
+                    clips.forEach(c => c.remove());
+                }
+            });
+
+            playlistClips.forEach((clip, index) => {
+                const row = trackRows[clip.track];
+                if (!row) return;
+                const lane = row.querySelector('.playlist-track-lane');
+                if (!lane) return;
+
+                const clipEl = document.createElement('div');
+                clipEl.className = `playlist-clip clip-${clip.type}`;
+                
+                const barPct = 100 / playlistBarsCount;
+                clipEl.style.left = `${clip.bar * barPct}%`;
+                clipEl.style.width = `${clip.duration * barPct}%`;
+
+                let previewContent = '';
+                if (clip.type === 'audio') {
+                    previewContent = `<canvas class="playlist-clip-preview-canvas" id="canvas-clip-${index}"></canvas>`;
+                } else if (clip.type === 'pattern') {
+                    previewContent = `<canvas class="playlist-clip-preview-canvas" id="canvas-clip-${index}"></canvas>`;
+                } else {
+                    previewContent = `
+                        <svg class="playlist-clip-preview-canvas" style="display:block; height:40px; width:100%;" viewBox="0 0 100 40" preserveAspectRatio="none">
+                            <path d="M 0 35 L 30 15 L 70 25 L 100 5" fill="none" stroke="var(--glow-green)" stroke-width="2" />
+                            <circle cx="0" cy="35" r="3" fill="var(--glow-green)" />
+                            <circle cx="30" cy="15" r="3" fill="var(--glow-green)" />
+                            <circle cx="70" cy="25" r="3" fill="var(--glow-green)" />
+                            <circle cx="100" cy="5" r="3" fill="var(--glow-green)" />
+                        </svg>
+                    `;
+                }
+
+                clipEl.innerHTML = `
+                    <div class="playlist-clip-title">${clip.type.toUpperCase()}: ${clip.id.toUpperCase()}</div>
+                    ${previewContent}
+                `;
+
+                clipEl.onclick = (e) => {
+                    e.stopPropagation();
+                    if (playlistTool === 'erase') {
+                        playlistClips.splice(index, 1);
+                        renderPlaylist();
+                    } else {
+                        showToast(`Clipe selecionado: ${clip.id}`);
+                    }
+                };
+
+                lane.appendChild(clipEl);
+
+                if (clip.type === 'audio' && playlistAudioClips[clip.id]) {
+                    setTimeout(() => {
+                        const cvs = document.getElementById(`canvas-clip-${index}`);
+                        if (cvs) drawClipWaveform(cvs, playlistAudioClips[clip.id].buffer);
+                    }, 10);
+                } else if (clip.type === 'pattern') {
+                    setTimeout(() => {
+                        const cvs = document.getElementById(`canvas-clip-${index}`);
+                        if (cvs) drawPatternClipPreview(cvs, clip.id);
+                    }, 10);
+                }
+            });
+        }
+
+        function drawClipWaveform(canvas, audioBuffer) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = canvas.clientWidth;
+            const h = canvas.height = canvas.clientHeight;
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = 'rgba(0, 229, 255, 0.4)';
+
+            const leftChannel = audioBuffer.getChannelData(0);
+            const step = Math.ceil(leftChannel.length / w);
+            const amp = h / 2;
+
+            ctx.beginPath();
+            ctx.moveTo(0, amp);
+
+            for (let i = 0; i < w; i++) {
+                let min = 1.0;
+                let max = -1.0;
+                for (let j = 0; j < step; j++) {
+                    const datum = leftChannel[i * step + j];
+                    if (datum < min) min = datum;
+                    if (datum > max) max = datum;
+                }
+                ctx.fillRect(i, amp + min * amp, 1, Math.max(1, (max - min) * amp));
+            }
+        }
+
+        function drawPatternClipPreview(canvas, chId) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = canvas.clientWidth;
+            const h = canvas.height = canvas.clientHeight;
+
+            ctx.clearRect(0, 0, w, h);
+            
+            const chan = channels[chId];
+            if (!chan || !chan.steps || chan.steps.length === 0) return;
+
+            const steps = chan.steps;
+            const numSteps = steps.length;
+            const colWidth = w / numSteps;
+            const isDrum = isDrumType(chan.type);
+            
+            if (isDrum) {
+                // For drums: draw simple trigger blocks in the middle row
+                ctx.fillStyle = 'rgba(255, 85, 51, 0.6)'; // orange glow
+                const blockHeight = h * 0.4;
+                const topPos = (h - blockHeight) / 2;
+                for (let i = 0; i < numSteps; i++) {
+                    if (steps[i]) {
+                        ctx.fillRect(i * colWidth + 2, topPos, colWidth - 4, blockHeight);
+                    }
+                }
+            } else {
+                // Melodic: draw note pitches
+                let allNotes = [];
+                for (let i = 0; i < numSteps; i++) {
+                    if (steps[i] && typeof steps[i] === 'string') {
+                        const chordNotes = steps[i].split('+');
+                        chordNotes.forEach(n => {
+                            const midiVal = noteToMidi(n.trim());
+                            if (midiVal > 0) {
+                                allNotes.push({ stepIdx: i, midi: midiVal });
+                            }
+                        });
+                    } else if (steps[i] && steps[i] === true) {
+                        allNotes.push({ stepIdx: i, midi: 60 }); // Middle C
+                    }
+                }
+
+                if (allNotes.length === 0) return;
+
+                let minMidi = Math.min(...allNotes.map(n => n.midi));
+                let maxMidi = Math.max(...allNotes.map(n => n.midi));
+                
+                if (maxMidi === minMidi) {
+                    minMidi -= 6;
+                    maxMidi += 6;
+                } else {
+                    minMidi -= 2;
+                    maxMidi += 2;
+                }
+                const midiRange = maxMidi - minMidi;
+
+                ctx.fillStyle = 'rgba(255, 85, 51, 0.7)'; // orange glow
+                const blockHeight = Math.max(3, h / (midiRange + 1));
+
+                allNotes.forEach(noteItem => {
+                    const x = noteItem.stepIdx * colWidth;
+                    const y = h - ((noteItem.midi - minMidi) / midiRange) * (h - blockHeight) - blockHeight;
+                    ctx.fillRect(x + 1, y, colWidth - 2, blockHeight);
+                });
+            }
+        }
+
+        async function togglePlaylistAudioRecording() {
+            const btnRec = document.getElementById('btn-playlist-record');
+            if (playlistMediaRecorder && playlistMediaRecorder.state === 'recording') {
+                playlistMediaRecorder.stop();
+                btnRec.innerText = '🎙️ REC';
+                btnRec.style.background = 'rgba(255,0,127,0.15)';
+                btnRec.style.color = 'var(--glow-magenta)';
+                showToast("Processando gravação...");
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                playlistMediaRecorder = new MediaRecorder(stream);
+                playlistRecordedChunks = [];
+
+                playlistMediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) playlistRecordedChunks.push(e.data);
+                };
+
+                playlistMediaRecorder.onstop = async () => {
+                    const blob = new Blob(playlistRecordedChunks, { type: 'audio/webm' });
+                    const arrayBuffer = await blob.arrayBuffer();
+                    
+                    initAudioEngine();
+                    if (audioCtx) {
+                        const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                        const clipId = `rec_${Date.now()}`;
+                        playlistAudioClips[clipId] = {
+                            name: `Voz ${Object.keys(playlistAudioClips).length + 1}`,
+                            buffer: audioBuffer
+                        };
+                        logMessage(`Gravação importada com sucesso (${audioBuffer.duration.toFixed(2)}s).`, "success");
+                        renderPlaylist();
+                    }
+                };
+
+                playlistMediaRecorder.start();
+                btnRec.innerText = '🛑 PARAR';
+                btnRec.style.background = '#ff0055';
+                btnRec.style.color = 'white';
+                showToast("Gravando voz...");
+            } catch (err) {
+                console.error("Microfone não disponível:", err);
+                showToast("Microfone não disponível");
+            }
+        }
+
+        function handlePlaylistAudioUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                initAudioEngine();
+                if (audioCtx) {
+                    try {
+                        const audioBuffer = await audioCtx.decodeAudioData(event.target.result);
+                        const clipId = `upload_${Date.now()}`;
+                        playlistAudioClips[clipId] = {
+                            name: file.name.substring(0, 15),
+                            buffer: audioBuffer
+                        };
+                        logMessage(`Áudio carregado: ${file.name} (${audioBuffer.duration.toFixed(2)}s)`, "success");
+                        renderPlaylist();
+                    } catch (err) {
+                        console.error("Erro no upload de áudio:", err);
+                        logMessage("Erro ao decodificar arquivo.", "error");
+                    }
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updatePlaylistPlayhead() {
+            const playhead = document.getElementById('playlist-playhead');
+            if (!playhead) return;
+
+            const timelineScroll = document.querySelector('.playlist-scroll-container');
+            if (!timelineScroll) return;
+
+            const totalWidth = timelineScroll.querySelector('.playlist-grid-wrapper').clientWidth - 120;
+            const barWidth = totalWidth / playlistBarsCount;
+            const stepWidth = barWidth / 16;
+
+            let displayStep = currentStep;
+            if (playMode === 'pat') {
+                displayStep = currentStep % 16;
+            }
+            
+            const leftPosition = 120 + displayStep * stepWidth;
+            playhead.style.left = `${leftPosition}px`;
+        }
+
         window.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 'Enter') {
                 e.preventDefault();
@@ -9173,6 +10123,76 @@
             loadSoundPresetList();
             initVirtualPiano();
             switchWorkspaceTab('wtab-editor');
+            
+            // Playlist Mode Toggle (PAT / SONG)
+            const btnModePat = document.getElementById('btn-mode-pat');
+            const btnModeSong = document.getElementById('btn-mode-song');
+            if (btnModePat && btnModeSong) {
+                btnModePat.onclick = () => {
+                    playMode = 'pat';
+                    btnModePat.classList.add('active');
+                    btnModeSong.classList.remove('active');
+                    btnModePat.style.background = 'var(--glow-orange)';
+                    btnModePat.style.color = 'var(--text-dark)';
+                    btnModePat.style.boxShadow = '0 0 8px var(--glow-orange)';
+                    btnModeSong.style.background = 'transparent';
+                    btnModeSong.style.color = 'var(--text-secondary)';
+                    btnModeSong.style.boxShadow = 'none';
+                    showToast("Modo PAT (Padrão) ativo");
+                    updatePlaylistPlayhead();
+                };
+                btnModeSong.onclick = () => {
+                    playMode = 'song';
+                    btnModeSong.classList.add('active');
+                    btnModePat.classList.remove('active');
+                    btnModeSong.style.background = 'var(--glow-orange)';
+                    btnModeSong.style.color = 'var(--text-dark)';
+                    btnModeSong.style.boxShadow = '0 0 8px var(--glow-orange)';
+                    btnModePat.style.background = 'transparent';
+                    btnModePat.style.color = 'var(--text-secondary)';
+                    btnModePat.style.boxShadow = 'none';
+                    showToast("Modo SONG (Música) ativo");
+                    updatePlaylistPlayhead();
+                };
+            }
+
+            // Playlist Toolbar Tools (Draw / Erase)
+            const btnPlToolDraw = document.getElementById('btn-pltool-draw');
+            const btnPlToolErase = document.getElementById('btn-pltool-erase');
+            if (btnPlToolDraw && btnPlToolErase) {
+                btnPlToolDraw.onclick = () => {
+                    playlistTool = 'draw';
+                    btnPlToolDraw.classList.add('active');
+                    btnPlToolErase.classList.remove('active');
+                    showToast("Lápis ativado: Desenhar clipes");
+                };
+                btnPlToolErase.onclick = () => {
+                    playlistTool = 'erase';
+                    btnPlToolErase.classList.add('active');
+                    btnPlToolDraw.classList.remove('active');
+                    showToast("Borracha ativada: Apagar clipes");
+                };
+            }
+
+            // Playlist Recording & Audio Upload
+            const btnPlRecord = document.getElementById('btn-playlist-record');
+            if (btnPlRecord) {
+                btnPlRecord.onclick = () => {
+                    togglePlaylistAudioRecording();
+                };
+            }
+
+            const btnPlUpload = document.getElementById('btn-playlist-upload');
+            const inputPlUpload = document.getElementById('playlist-audio-upload-input');
+            if (btnPlUpload && inputPlUpload) {
+                btnPlUpload.onclick = () => {
+                    inputPlUpload.click();
+                };
+                inputPlUpload.onchange = (e) => {
+                    handlePlaylistAudioUpload(e);
+                };
+            }
+
             
             // Metrônomo Toggle Binding
             const btnMetronome = document.getElementById('btn-metronome');
