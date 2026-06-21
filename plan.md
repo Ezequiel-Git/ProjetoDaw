@@ -26,8 +26,13 @@ Este plano detalha o estado atual da DAW customizada contida no arquivo [index.h
    - **[RESOLVIDO] Salvamento Completo:** Agora o JSON de exportação salva toda a playlist (`playlistClips`), as automações (`playlistAutomations`) e serializa em Base64 todos os clipes de áudio gravados ou carregados.
 
 5. **[RESOLVIDO] Visual Premium & Botões Modernizados**:
-   - **Controles de Transporte:** Novo estilo com gradientes escuros, bordas refinadas e efeitos de neon pulsante nas cores verde (play), magenta (stop), ciano (pause) e laranja/vermelho (record), com animações 3D de translação (translate Y) e escala (scale) ao passar o mouse.
-   - **Ações de Projeto (Save/Load/Export):** Novo estilo sem estilos inline, utilizando classes CSS dedicadas (`.btn-save`, `.btn-load`, `.btn-export`) com efeitos modernos de reflexão (inset shadows) e sombras brilhantes (box shadow glow).
+   - **Controles de Transporte:** Novo estilo com gradientes escuros, bordas refinadas e efeitos de neon pulsante.
+   - **Ações de Projeto (Save/Load/Export):** CSS limpo com as classes `.btn-save`, `.btn-load`, `.btn-export` contendo sombras e reflexos modernos.
+
+6. **[RESOLVIDO] Sincronização Automática Editor ➔ Playlist**:
+   - **Geração Automática de Clipes:** Sempre que você escrever ou compilar código no editor (como os longos loops de Kick/Perc que você criou), a DAW irá criar automaticamente clipes de padrões correspondentes na Playlist no **tempo e compasso corretos**.
+   - **Redimensionamento Dinâmico da Timeline:** Se o padrão compilado tiver uma duração muito longa (por exemplo, 48 ou 160 passos), a quantidade de barras da timeline (`playlistBarsCount`) e as linhas do grid visual se adaptam automaticamente para caber toda a sequência sem cortar.
+   - **Preservação de Edições Manuais:** Se você desenhar blocos extras manualmente na timeline, suas posições são preservadas, apenas atualizando suas durações e canais quando o código for recompilado.
 
 ---
 
