@@ -5194,6 +5194,10 @@
 
         // --- AUXILIARES E COMPILADOR DO NOVO EDITOR DE CÓDIGO ---
         function transposeNote(noteStr, semitones) {
+            if (typeof noteStr !== 'string') return noteStr;
+            if (noteStr.includes('+')) {
+                return noteStr.split('+').map(n => transposeNote(n.trim(), semitones)).join('+');
+            }
             const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
             const match = noteStr.match(/^([A-G]#?|D[b#]|E[b]|G[b]|A[b]|B[b])(\d)$/i);
             if (!match) return noteStr;
@@ -5782,12 +5786,20 @@
                 const stepsArr = activeParsedCode[chId];
                 if (stepsArr) {
                     const stepIdx = stepNumber % stepsArr.length;
-                    if (stepsArr[stepIdx]) {
+                    const stepVal = stepsArr[stepIdx];
+                    if (stepVal) {
                         if (mixer[chId]) {
-                            const freq = isDrumType(chanState.type) 
-                                ? 0 : noteToFreq(stepsArr[stepIdx]);
-                            
-                            triggerChannelSynth(audioCtx, time, freq, chanState, mixer[chId]);
+                            if (isDrumType(chanState.type)) {
+                                triggerChannelSynth(audioCtx, time, 0, chanState, mixer[chId]);
+                            } else if (typeof stepVal === 'string') {
+                                const notes = stepVal.split('+');
+                                notes.forEach(n => {
+                                    const freq = noteToFreq(n.trim());
+                                    if (freq > 0) {
+                                        triggerChannelSynth(audioCtx, time, freq, chanState, mixer[chId]);
+                                    }
+                                });
+                            }
                         }
                     }
                 }
@@ -6243,18 +6255,26 @@
                     const beatIdx = Math.floor(i / 4);
                     cell.style.backgroundColor = beatIdx % 2 === 0 ? '#0b0b0f' : '#12121a';
                     
-                    if (chan.steps[i] === note) {
+                    const hasNote = typeof chan.steps[i] === 'string' && chan.steps[i].split('+').includes(note);
+                    if (chan.steps[i] === note || hasNote) {
                         cell.classList.add('active');
                     }
                     
                     cell.onclick = () => {
                         if (cell.classList.contains('active')) {
                             cell.classList.remove('active');
-                            chan.steps[i] = false;
+                            if (typeof chan.steps[i] === 'string') {
+                                let notes = chan.steps[i].split('+');
+                                notes = notes.filter(n => n !== note);
+                                if (notes.length > 0) {
+                                    chan.steps[i] = notes.join('+');
+                                } else {
+                                    chan.steps[i] = false;
+                                }
+                            } else {
+                                chan.steps[i] = false;
+                            }
                         } else {
-                            const colCells = gridContainer.querySelectorAll(`.piano-row .piano-cell:nth-child(${i + 1})`);
-                            colCells.forEach(c => c.classList.remove('active'));
-                            
                             cell.classList.add('active');
                             if (isDrumType(chan.type)) {
                                 chan.steps[i] = true;
@@ -6264,7 +6284,15 @@
                                     triggerChannelSynth(audioCtx, audioCtx.currentTime, 0, chan, mixer[chId] || mixer.master);
                                 }
                             } else {
-                                chan.steps[i] = note;
+                                if (typeof chan.steps[i] === 'string') {
+                                    let notes = chan.steps[i].split('+');
+                                    if (!notes.includes(note)) {
+                                        notes.push(note);
+                                    }
+                                    chan.steps[i] = notes.join('+');
+                                } else {
+                                    chan.steps[i] = note;
+                                }
                                 initAudioEngine();
                                 if (audioCtx) {
                                     if (audioCtx.state === 'suspended') audioCtx.resume();
