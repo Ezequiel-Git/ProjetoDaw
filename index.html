@@ -440,17 +440,33 @@
             font-family: 'Orbitron', 'Trebuchet MS', sans-serif;
             font-size: 0.75rem;
             font-weight: 700;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
 
         .sidebar-tab-btn:hover {
             color: white;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
         }
 
         .sidebar-tab-btn.active {
             color: var(--glow-orange);
             border-bottom-color: var(--glow-orange);
-            background: rgba(255, 85, 51, 0.02);
+            background: linear-gradient(to bottom, transparent, rgba(255, 85, 51, 0.03));
+            text-shadow: 0 0 8px rgba(255, 85, 51, 0.4);
+        }
+        
+        .sidebar-tab-btn.active::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--glow-orange);
+            box-shadow: 0 0 6px var(--glow-orange);
+            border-radius: 1px;
         }
 
         .sidebar-content {
@@ -463,19 +479,22 @@
         }
 
         .preset-item {
-            background: #181822;
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            padding: 12px;
+            background: linear-gradient(135deg, rgba(24, 24, 34, 0.8) 0%, rgba(16, 16, 24, 0.8) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            padding: 14px;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
         .preset-item:hover {
             border-color: var(--glow-orange);
-            background: rgba(255, 85, 51, 0.04);
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(255, 85, 51, 0.06) 0%, rgba(255, 85, 51, 0.01) 100%);
+            box-shadow: 0 6px 18px rgba(255, 85, 51, 0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+            transform: translateY(-2.5px);
         }
 
         .preset-name {
@@ -483,6 +502,7 @@
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 4px;
+            letter-spacing: 0.5px;
         }
 
         .preset-desc {
@@ -574,7 +594,9 @@
         .workspace-tab-btn.active {
             color: var(--glow-orange);
             border-bottom-color: var(--glow-orange);
-            background: linear-gradient(to bottom, transparent, rgba(255, 85, 51, 0.04));
+            background: linear-gradient(to bottom, transparent 40%, rgba(255, 85, 51, 0.05));
+            text-shadow: 0 0 8px rgba(255, 85, 51, 0.4);
+            box-shadow: inset 0 -4px 10px -4px rgba(255, 85, 51, 0.2);
         }
 
         .workspace-content {
@@ -1093,30 +1115,52 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            width: 60px;
-            background: #171722;
-            padding: 15px 5px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.02);
+            width: 65px;
+            background: linear-gradient(180deg, rgba(23, 23, 34, 0.6) 0%, rgba(13, 13, 21, 0.85) 100%);
+            backdrop-filter: blur(10px);
+            padding: 18px 6px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
             flex-shrink: 0;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .mixer-strip:hover {
+            background: linear-gradient(180deg, rgba(30, 30, 45, 0.7) 0%, rgba(20, 20, 32, 0.9) 100%);
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .mixer-strip.selected-strip {
+            background: linear-gradient(180deg, rgba(255, 85, 51, 0.1) 0%, rgba(255, 85, 51, 0.03) 100%) !important;
+            border-color: rgba(255, 85, 51, 0.6) !important;
+            box-shadow: 0 0 15px rgba(255, 85, 51, 0.25), inset 0 0 8px rgba(255, 85, 51, 0.05);
         }
 
         .mixer-strip.master-strip {
-            background: #202030;
-            border-color: rgba(255, 85, 51, 0.2);
-            border-left: 2px dashed rgba(255, 85, 51, 0.35);
+            background: linear-gradient(180deg, rgba(0, 229, 255, 0.08) 0%, rgba(10, 10, 18, 0.9) 100%);
+            border-color: rgba(0, 229, 255, 0.3) !important;
             margin-left: 15px;
             padding-left: 10px;
+            cursor: default;
+        }
+        .mixer-strip.master-strip:hover {
+            transform: none;
+            box-shadow: none;
         }
 
         .vu-meter {
-            width: 12px;
-            height: 140px;
-            background: #07070a;
-            border-radius: 4px;
+            width: 10px;
+            height: 120px;
+            background: #050508;
+            border-radius: 6px;
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1.5px solid rgba(0, 0, 0, 0.6);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.9);
         }
 
         .vu-bar {
@@ -1124,8 +1168,14 @@
             height: 0%;
             position: absolute;
             bottom: 0;
-            background: linear-gradient(to top, var(--glow-green) 0%, var(--glow-yellow) 70%, var(--glow-orange) 100%);
-            transition: height 0.05s ease;
+            background: linear-gradient(to top, var(--glow-green) 0%, var(--glow-green) 50%, var(--glow-yellow) 75%, var(--glow-orange) 95%, #ff0000 100%);
+            box-shadow: 0 0 10px rgba(46, 219, 90, 0.4);
+            /* Segmented LED look */
+            background-image: 
+                linear-gradient(to top, var(--glow-green) 0%, var(--glow-green) 50%, var(--glow-yellow) 75%, var(--glow-orange) 95%, #ff0000 100%),
+                linear-gradient(to bottom, transparent 3px, rgba(0, 0, 0, 0.85) 3px);
+            background-size: 100% 100%, 100% 5px;
+            transition: height 0.04s cubic-bezier(0.1, 0.8, 0.3, 1);
         }
 
         .fader-wrapper {
@@ -1141,13 +1191,14 @@
             appearance: none;
             width: 90px;
             height: 6px;
-            background: rgba(255, 255, 255, 0.08);
+            background: #020204;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
             border-radius: 3px;
             outline: none;
             cursor: pointer;
             transform: rotate(-90deg);
             position: absolute;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
             transition: all 0.2s ease;
         }
 
@@ -1163,31 +1214,29 @@
         .fader-input::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            height: 16px;
-            width: 12px;
+            height: 24px;
+            width: 16px;
             border-radius: 3px;
-            background: var(--glow-orange);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(to right, #444 0%, #666 45%, #fff 50%, #666 55%, #333 100%);
+            border: 1px solid #111;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 85, 51, 0.6), 0 0 4px rgba(0,0,0,0.6);
-            transition: transform 0.1s ease, background-color 0.2s;
-            margin-top: -5px; /* (track_height/2) - (thumb_height/2) */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 85, 51, 0.4);
+            margin-top: -9px; /* (6px / 2) - (24px / 2) */
+            transition: transform 0.1s ease;
         }
 
         .fader-input:hover::-webkit-slider-thumb {
-            background: #ff7d5c;
-            transform: scale(1.15);
-            box-shadow: 0 0 14px rgba(255, 85, 51, 0.9), 0 0 4px rgba(0,0,0,0.6);
+            background: linear-gradient(to right, #555 0%, #888 45%, #fff 50%, #888 55%, #444 100%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9), 0 0 12px rgba(255, 85, 51, 0.7);
+            transform: scale(1.1);
         }
 
         .fader-input.master-fader::-webkit-slider-thumb {
-            background: var(--glow-cyan);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.6), 0 0 4px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 242, 254, 0.4);
         }
 
         .fader-input.master-fader:hover::-webkit-slider-thumb {
-            background: #5cf5ff;
-            box-shadow: 0 0 14px rgba(0, 242, 254, 0.9), 0 0 4px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 242, 254, 0.7);
         }
 
         /* Firefox */
@@ -1200,30 +1249,28 @@
         }
 
         .fader-input::-moz-range-thumb {
-            height: 16px;
-            width: 12px;
+            height: 24px;
+            width: 16px;
             border-radius: 3px;
-            background: var(--glow-orange);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(to right, #444 0%, #666 45%, #fff 50%, #666 55%, #333 100%);
+            border: 1px solid #111;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 85, 51, 0.6), 0 0 4px rgba(0,0,0,0.6);
-            transition: transform 0.1s ease, background-color 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 85, 51, 0.4);
+            transition: transform 0.1s ease;
         }
 
         .fader-input:hover::-moz-range-thumb {
-            background: #ff7d5c;
-            transform: scale(1.15);
-            box-shadow: 0 0 14px rgba(255, 85, 51, 0.9), 0 0 4px rgba(0,0,0,0.6);
+            background: linear-gradient(to right, #555 0%, #888 45%, #fff 50%, #888 55%, #444 100%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9), 0 0 12px rgba(255, 85, 51, 0.7);
+            transform: scale(1.1);
         }
 
         .fader-input.master-fader::-moz-range-thumb {
-            background: var(--glow-cyan);
-            box-shadow: 0 0 10px rgba(0, 242, 254, 0.6), 0 0 4px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 242, 254, 0.4);
         }
 
         .fader-input.master-fader:hover::-moz-range-thumb {
-            background: #5cf5ff;
-            box-shadow: 0 0 14px rgba(0, 242, 254, 0.9), 0 0 4px rgba(0,0,0,0.6);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 242, 254, 0.7);
         }
 
         .mixer-label {
@@ -3119,6 +3166,7 @@
         let channelReverbGains = {};
         let channelChorusGains = {};
         let channelDistNodes = {};
+        let channelAnalysers = {};
         let channelChorusLfos = {};
         let sharedReverbBuffer = null;
         
@@ -3550,6 +3598,12 @@
                     }
 
                     mixer[chId] = audioCtx.createGain();
+                    
+                    // Analisador VU individual
+                    const chAnalyser = audioCtx.createAnalyser();
+                    chAnalyser.fftSize = 32;
+                    mixer[chId].connect(chAnalyser);
+                    channelAnalysers[chId] = chAnalyser;
                     
                     // 1. Distortion Node
                     const distNode = audioCtx.createWaveShaper();
@@ -6537,7 +6591,7 @@
             Object.keys(channels).forEach(chId => {
                 const chan = channels[chId];
                 const strip = document.createElement('div');
-                strip.className = 'mixer-strip';
+                strip.className = 'mixer-strip' + (chId === selectedChannelId ? ' selected-strip' : '');
 
                 strip.innerHTML = `
                     <div class="vu-meter">
@@ -6548,6 +6602,15 @@
                     </div>
                     <span class="mixer-label">${chId.toUpperCase()}</span>
                 `;
+
+                // Click handler to select channel
+                strip.addEventListener('mousedown', (e) => {
+                    if (!e.target.classList.contains('fader-input')) {
+                        selectedChannelId = chId;
+                        loadChannelSettings(chId);
+                        renderDAW();
+                    }
+                });
 
                 // Fader do Mixer
                 strip.querySelector('.fader-input').addEventListener('input', (e) => {
@@ -6606,6 +6669,13 @@
             // Adiciona nó dinâmico se motor estiver rodando
             if (audioCtx) {
                 mixer[chId] = audioCtx.createGain();
+                
+                // Analisador VU individual dinâmico
+                const chAnalyser = audioCtx.createAnalyser();
+                chAnalyser.fftSize = 32;
+                mixer[chId].connect(chAnalyser);
+                channelAnalysers[chId] = chAnalyser;
+                
                 panners[chId] = audioCtx.createStereoPanner();
                 panners[chId].pan.value = 0;
 
@@ -7133,6 +7203,7 @@
                         channelReverbGains = {};
                         channelChorusGains = {};
                         channelDistNodes = {};
+                        channelAnalysers = {};
                         channelChorusLfos = {};
                         sharedReverbBuffer = null;
                         analyser = null;
@@ -7252,12 +7323,12 @@
             }
         }
 
-        function drawADSR() {
+        let activeAdsrHandle = null;
+        let hoveredAdsrHandle = null;
+
+        function getAdsrCoordinates() {
             const canvas = document.getElementById('adsr-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+            if (!canvas) return null;
             const w = canvas.width;
             const h = canvas.height;
             const pad = 5;
@@ -7268,14 +7339,28 @@
             const r = parseFloat(document.getElementById('knob-release').value) || 0.05;
             
             const totalT = Math.max(0.5, a + d + r + 0.5);
-            const xA = pad + (a / totalT) * (w - 2*pad);
-            const xD = xA + (d / totalT) * (w - 2*pad);
-            const xS = xD + (0.5 / totalT) * (w - 2*pad);
-            const xR = xS + (r / totalT) * (w - 2*pad);
+            const xA = pad + (a / totalT) * (w - 2 * pad);
+            const xD = xA + (d / totalT) * (w - 2 * pad);
+            const xS = xD + (0.5 / totalT) * (w - 2 * pad);
+            const xR = xS + (r / totalT) * (w - 2 * pad);
             
             const y0 = h - pad;
             const y1 = pad;
-            const yS = h - pad - s * (h - 2*pad);
+            const yS = h - pad - s * (h - 2 * pad);
+            
+            return { w, h, pad, a, d, s, r, totalT, xA, xD, xS, xR, y0, y1, yS };
+        }
+
+        function drawADSR() {
+            const canvas = document.getElementById('adsr-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const coords = getAdsrCoordinates();
+            if (!coords) return;
+            
+            const { w, h, pad, xA, xD, xS, xR, y0, y1, yS } = coords;
             
             ctx.beginPath();
             ctx.moveTo(pad, y0);
@@ -7319,7 +7404,141 @@
             ctx.stroke();
             
             ctx.shadowBlur = 0; // Reset
+            
+            // Draw Handles
+            const handles = [
+                { name: 'attack', x: xA, y: y1 },
+                { name: 'decay_sustain', x: xD, y: yS },
+                { name: 'release', x: xR, y: y0 }
+            ];
+            
+            handles.forEach(hnd => {
+                ctx.beginPath();
+                ctx.arc(hnd.x, hnd.y, (activeAdsrHandle === hnd.name || hoveredAdsrHandle === hnd.name) ? 6 : 4, 0, 2 * Math.PI);
+                ctx.fillStyle = (activeAdsrHandle === hnd.name || hoveredAdsrHandle === hnd.name) ? '#ffffff' : strokeColor;
+                ctx.strokeStyle = '#050508';
+                ctx.lineWidth = 1.5;
+                ctx.fill();
+                ctx.stroke();
+            });
         }
+
+        // Setup ADSR interactive mouse listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('adsr-canvas');
+            if (canvas) {
+                function getMousePos(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    return {
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                    };
+                }
+                
+                canvas.addEventListener('mousedown', (e) => {
+                    const pos = getMousePos(e);
+                    const coords = getAdsrCoordinates();
+                    if (!coords) return;
+                    
+                    const distA = Math.hypot(pos.x - coords.xA, pos.y - coords.y1);
+                    const distD = Math.hypot(pos.x - coords.xD, pos.y - coords.yS);
+                    const distR = Math.hypot(pos.x - coords.xR, pos.y - coords.y0);
+                    
+                    if (distA < 15) {
+                        activeAdsrHandle = 'attack';
+                    } else if (distD < 15) {
+                        activeAdsrHandle = 'decay_sustain';
+                    } else if (distR < 15) {
+                        activeAdsrHandle = 'release';
+                    }
+                    
+                    if (activeAdsrHandle) {
+                        e.preventDefault();
+                        drawADSR();
+                    }
+                });
+                
+                window.addEventListener('mousemove', (e) => {
+                    if (!activeAdsrHandle) {
+                        const rect = canvas.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        if (x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height) {
+                            const coords = getAdsrCoordinates();
+                            if (coords) {
+                                const distA = Math.hypot(x - coords.xA, y - coords.y1);
+                                const distD = Math.hypot(x - coords.xD, y - coords.yS);
+                                const distR = Math.hypot(x - coords.xR, y - coords.y0);
+                                
+                                let newHover = null;
+                                if (distA < 15) newHover = 'attack';
+                                else if (distD < 15) newHover = 'decay_sustain';
+                                else if (distR < 15) newHover = 'release';
+                                
+                                if (newHover !== hoveredAdsrHandle) {
+                                    hoveredAdsrHandle = newHover;
+                                    canvas.style.cursor = hoveredAdsrHandle ? 'pointer' : 'default';
+                                    drawADSR();
+                                }
+                            }
+                        } else if (hoveredAdsrHandle) {
+                            hoveredAdsrHandle = null;
+                            canvas.style.cursor = 'default';
+                            drawADSR();
+                        }
+                        return;
+                    }
+                    
+                    const rect = canvas.getBoundingClientRect();
+                    const mx = e.clientX - rect.left;
+                    const my = e.clientY - rect.top;
+                    const coords = getAdsrCoordinates();
+                    if (!coords) return;
+                    
+                    const { w, h, pad, xA, xD, xS, y0, y1, yS, totalT } = coords;
+                    
+                    if (activeAdsrHandle === 'attack') {
+                        const pct = Math.max(0.01, Math.min(1.0, (mx - pad) / (w - 2*pad)));
+                        let newA = pct * (coords.d + coords.r + 0.5) / (1.001 - pct);
+                        newA = Math.max(0.01, Math.min(1.0, newA));
+                        
+                        const input = document.getElementById('knob-attack');
+                        input.value = newA;
+                        input.dispatchEvent(new Event('input'));
+                    } else if (activeAdsrHandle === 'decay_sustain') {
+                        let newS = (h - pad - my) / (h - 2*pad);
+                        newS = Math.max(0, Math.min(1.0, newS));
+                        
+                        const pct = Math.max(0.05, Math.min(1.0, (mx - xA) / (w - 2*pad)));
+                        let newD = pct * (coords.a + coords.r + 0.5) / (1.001 - pct);
+                        newD = Math.max(0.05, Math.min(2.0, newD));
+                        
+                        const inputS = document.getElementById('knob-sustain');
+                        inputS.value = newS;
+                        inputS.dispatchEvent(new Event('input'));
+                        
+                        const inputD = document.getElementById('knob-decay');
+                        inputD.value = newD;
+                        inputD.dispatchEvent(new Event('input'));
+                    } else if (activeAdsrHandle === 'release') {
+                        const pct = Math.max(0.05, Math.min(1.0, (mx - xS) / (w - 2*pad)));
+                        let newR = pct * (coords.a + coords.d + 0.5) / (1.001 - pct);
+                        newR = Math.max(0.05, Math.min(2.0, newR));
+                        
+                        const inputR = document.getElementById('knob-release');
+                        inputR.value = newR;
+                        inputR.dispatchEvent(new Event('input'));
+                    }
+                });
+                
+                window.addEventListener('mouseup', () => {
+                    if (activeAdsrHandle) {
+                        activeAdsrHandle = null;
+                        drawADSR();
+                    }
+                });
+            }
+        });
 
         // Vincular sliders do Painel de knobs
         const knobs = [
@@ -10694,6 +10913,61 @@
                     }
                 }, { passive: false });
             }
+
+            // VU meter update loop definition and call
+            let vuAnimationId = null;
+            function startVuMetersLoop() {
+                if (vuAnimationId) return;
+                
+                const bufferLen = 16;
+                const dataArr = new Uint8Array(bufferLen);
+                
+                function updateVU() {
+                    vuAnimationId = requestAnimationFrame(updateVU);
+                    
+                    // Update channel VU meters
+                    Object.keys(channels).forEach(chId => {
+                        const bar = document.getElementById(`${chId}-vu-bar`);
+                        if (!bar) return;
+                        
+                        const chAnalyser = channelAnalysers[chId];
+                        let volumePct = 0;
+                        
+                        if (chAnalyser && audioCtx && audioCtx.state === 'running') {
+                            chAnalyser.getByteFrequencyData(dataArr);
+                            let sum = 0;
+                            for (let i = 0; i < bufferLen; i++) {
+                                sum += dataArr[i];
+                            }
+                            const average = sum / bufferLen;
+                            // scale to 0-100% nicely
+                            volumePct = Math.min(100, (average / 255) * 150);
+                        }
+                        
+                        bar.style.height = `${volumePct}%`;
+                    });
+                    
+                    // Update Master VU meter
+                    const masterBar = document.getElementById('master-vu-bar');
+                    if (masterBar) {
+                        let masterPct = 0;
+                        if (analyser && audioCtx && audioCtx.state === 'running') {
+                            analyser.getByteFrequencyData(dataArr);
+                            let sum = 0;
+                            for (let i = 0; i < bufferLen; i++) {
+                                sum += dataArr[i];
+                            }
+                            const average = sum / bufferLen;
+                            masterPct = Math.min(100, (average / 255) * 150);
+                        }
+                        masterBar.style.height = `${masterPct}%`;
+                    }
+                }
+                updateVU();
+            }
+
+            // Start VU meter tracking
+            startVuMetersLoop();
         });
     </script>
 

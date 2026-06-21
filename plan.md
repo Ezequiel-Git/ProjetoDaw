@@ -37,6 +37,12 @@ Este plano detalha o estado atual da DAW customizada contida no arquivo [index.h
    - **Playhead Sincronizado e Inteligente:** Corrigido o bug em que o playhead voltava após 4 compassos no modo PAT (Pattern), mesmo quando o padrão do usuário era maior. Agora o playhead usa o `visualStep` sincronizado com o Web Audio Context e calcula dinamicamente o ponto de retorno baseado no tamanho real dos passos do padrão compilado (`maxSteps`), e avança linearmente no modo SONG.
    - **Botão ADD TRACK:** Adicionado um botão interativo na barra da Playlist que permite criar dinamicamente novas trilhas de arranjo com um único clique.
 
+8. **[RESOLVIDO] Upgrade Premium da DAW (Cyber v7.0)**:
+   - **Canvas ADSR Interativo:** O painel de envelope ADSR agora suporta arrastar os nós visuais com o mouse para alterar as configurações do sintetizador do canal em tempo real.
+   - **VU Meters Segmentados:** Displays em degrade de LEDs reativos adicionados em todas as tiras do Mixer (individuais e Master) que animam usando analysers do Web Audio API no ritmo exato do playback.
+   - **Faders Metálicos de Console:** O estilo dos controles de fader de volume no Mixer foi remodelado para parecer fisicamente tátil com destaques metálicos tridimensionais.
+   - **Navegação Sincronizada no Mixer:** Clicar na tira do mixer de qualquer canal agora ativa e seleciona automaticamente esse canal na DAW.
+
 ---
 
 ## Próximas Ideias e Melhorias Propostas
