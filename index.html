@@ -6920,6 +6920,49 @@
             recordedSamplesCount = 0;
         }
 
+        // --- AUXILIARES PARA SERIALIZAÇÃO DE AUDIOBUFFER ---
+        function serializeAudioBuffer(audioBuffer) {
+            if (!audioBuffer) return null;
+            const channelsData = [];
+            for (let c = 0; c < audioBuffer.numberOfChannels; c++) {
+                const floatData = audioBuffer.getChannelData(c);
+                const uint8 = new Uint8Array(floatData.buffer, floatData.byteOffset, floatData.byteLength);
+                let binary = '';
+                const len = uint8.byteLength;
+                for (let i = 0; i < len; i++) {
+                    binary += String.fromCharCode(uint8[i]);
+                }
+                channelsData.push(window.btoa(binary));
+            }
+            return {
+                sampleRate: audioBuffer.sampleRate,
+                length: audioBuffer.length,
+                numberOfChannels: audioBuffer.numberOfChannels,
+                channelsData: channelsData
+            };
+        }
+
+        function deserializeAudioBuffer(ctx, serialized) {
+            if (!serialized || !ctx) return null;
+            try {
+                const audioBuffer = ctx.createBuffer(serialized.numberOfChannels, serialized.length, serialized.sampleRate);
+                for (let c = 0; c < serialized.numberOfChannels; c++) {
+                    const base64 = serialized.channelsData[c];
+                    const binary = window.atob(base64);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) {
+                        bytes[i] = binary.charCodeAt(i);
+                    }
+                    const floatData = new Float32Array(bytes.buffer);
+                    audioBuffer.copyToChannel(floatData, c);
+                }
+                return audioBuffer;
+            } catch (err) {
+                console.error("Erro ao desserializar AudioBuffer:", err);
+                return null;
+            }
+        }
+
         // --- SALVAR / CARREGAR PROJETOS JSON ---
         function exportProjectAsJSON() {
             try {
@@ -6927,13 +6970,26 @@
                 const code = document.getElementById('code-editor').value;
                 const bpm = activeParsedCode ? activeParsedCode.bpm : 120;
 
+                // Serializar clipes de áudio em formato Base64 para total persistência
+                const serializedAudioClips = {};
+                Object.keys(playlistAudioClips).forEach(clipId => {
+                    const clip = playlistAudioClips[clipId];
+                    serializedAudioClips[clipId] = {
+                        name: clip.name,
+                        serializedBuffer: serializeAudioBuffer(clip.buffer)
+                    };
+                });
+
                 const projectData = {
                     version: 1,
                     musicName: musicName,
                     bpm: bpm,
                     code: code,
                     channels: channels,
-                    selectedChannelId: selectedChannelId
+                    selectedChannelId: selectedChannelId,
+                    playlistClips: playlistClips,
+                    playlistAutomations: playlistAutomations,
+                    playlistAudioClips: serializedAudioClips
                 };
 
                 const jsonString = JSON.stringify(projectData, null, 2);
@@ -6993,15 +7049,39 @@
 
                     if (data.bpm) {
                         document.getElementById('bpm-slider').value = data.bpm;
-                        document.getElementById('display-bpm').innerText = data.bpm;
+                        document.getElementById('display-bpm').value = data.bpm;
                     }
 
                     selectedChannelId = data.selectedChannelId || Object.keys(channels)[0];
                     activeParsedCode = parseDAWCode(data.code);
 
+                    // Restaurar dados da playlist
+                    playlistClips = data.playlistClips || [];
+                    playlistAutomations = data.playlistAutomations || {
+                        'lead_vol': { name: 'LEAD Vol', target: 'lead', param: 'volume', points: [{x: 0, y: 0.8}, {x: 1, y: 0.8}] },
+                        'bass_cutoff': { name: 'BASS Cutoff', target: 'bass', param: 'cutoff', points: [{x: 0, y: 700}, {x: 1, y: 700}] }
+                    };
+
                     renderDAW();
                     initAudioEngine();
                     loadChannelSettings(selectedChannelId);
+
+                    // Desserializar clipes de áudio com o novo AudioContext
+                    playlistAudioClips = {};
+                    if (data.playlistAudioClips && audioCtx) {
+                        Object.keys(data.playlistAudioClips).forEach(clipId => {
+                            const clipData = data.playlistAudioClips[clipId];
+                            playlistAudioClips[clipId] = {
+                                name: clipData.name,
+                                buffer: deserializeAudioBuffer(audioCtx, clipData.serializedBuffer)
+                            };
+                        });
+                    }
+
+                    // Forçar re-renderização visual da playlist para carregar waveforms corretas
+                    if (typeof renderPlaylist === 'function') {
+                        renderPlaylist();
+                    }
 
                     logMessage(`Projeto importado com sucesso: '${data.musicName}'`, "success");
                     showToast("Projeto Importado!");
