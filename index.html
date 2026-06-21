@@ -6109,6 +6109,60 @@
                 });
             }
 
+            // Sincronizar clipes da playlist com as faixas do código compilado
+            if (typeof playlistClips !== 'undefined') {
+                // Remove clipes de padrões de canais que foram deletados
+                playlistClips = playlistClips.filter(c => c.type !== 'pattern' || compiledChannels.has(c.id));
+                
+                const sortedChs = Array.from(compiledChannels);
+                
+                sortedChs.forEach((chId, index) => {
+                    const chan = channels[chId];
+                    if (chan && chan.steps) {
+                        const duration = Math.max(1, Math.ceil(chan.steps.length / 16));
+                        
+                        // Verifica se já existem clipes deste padrão
+                        const existingClips = playlistClips.filter(c => c.type === 'pattern' && c.id === chId);
+                        if (existingClips.length > 0) {
+                            existingClips.forEach(c => {
+                                c.track = index;
+                                c.duration = duration;
+                            });
+                        } else {
+                            // Cria no bar 0 se for novo
+                            playlistClips.push({
+                                track: index,
+                                bar: 0,
+                                type: 'pattern',
+                                id: chId,
+                                duration: duration
+                            });
+                        }
+                    }
+                });
+
+                // Ajustar a quantidade de compassos (bars) na timeline se o clipe for maior que playlistBarsCount
+                let maxDuration = 32;
+                sortedChs.forEach(chId => {
+                    const chan = channels[chId];
+                    if (chan && chan.steps) {
+                        const duration = Math.max(1, Math.ceil(chan.steps.length / 16));
+                        if (duration > maxDuration) {
+                            maxDuration = duration;
+                        }
+                    }
+                });
+                playlistBarsCount = Math.max(32, maxDuration);
+
+                if (sortedChs.length > playlistTracksCount) {
+                    playlistTracksCount = sortedChs.length;
+                }
+
+                if (typeof renderPlaylist === 'function') {
+                    renderPlaylist();
+                }
+            }
+
             return parsed;
         }
 
@@ -9820,6 +9874,7 @@
                     // Track Lane
                     const lane = document.createElement('div');
                     lane.className = 'playlist-track-lane';
+                    lane.style.backgroundSize = `calc(100% / ${playlistBarsCount}) 100%`;
                     
                     lane.onclick = (e) => {
                         if (e.target !== lane) return;
