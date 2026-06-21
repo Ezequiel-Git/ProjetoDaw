@@ -2567,6 +2567,9 @@
                             <div class="card-header" style="padding: 8px 15px; display: flex; justify-content: space-between; align-items: center;">
                                 <div class="card-title">PLAYLIST TRACKS & ARRANGEMENT</div>
                                 <div style="display: flex; align-items: center; gap: 12px;">
+                                    <!-- Add Track Button -->
+                                    <button class="btn-action btn-load" id="btn-playlist-add-track" style="padding: 4px 10px; font-size: 0.7rem;">➕ ADD TRACK</button>
+
                                     <!-- Tool selector -->
                                     <div style="display: flex; background: #111116; border: 1px solid rgba(255,255,255,0.06); padding: 2px; border-radius: 6px;">
                                         <button id="btn-pltool-draw" class="transport-btn active" title="Lápis (Pintar Clipes)" style="width: 28px; height: 28px; font-size: 0.8rem; border: none; background: transparent; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center;">✏️</button>
@@ -10236,9 +10239,19 @@
             const barWidth = totalWidth / playlistBarsCount;
             const stepWidth = barWidth / 16;
 
-            let displayStep = currentStep;
+            let displayStep = visualStep;
             if (playMode === 'pat') {
-                displayStep = currentStep % 16;
+                let maxSteps = 16;
+                if (activeParsedCode) {
+                    Object.keys(activeParsedCode).forEach(chId => {
+                        if (chId === 'bpm') return;
+                        const arr = activeParsedCode[chId];
+                        if (arr && arr.length > maxSteps) {
+                            maxSteps = arr.length;
+                        }
+                    });
+                }
+                displayStep = visualStep % maxSteps;
             }
             
             const leftPosition = 120 + displayStep * stepWidth;
@@ -10364,6 +10377,16 @@
                     btnModePat.style.boxShadow = 'none';
                     showToast("Modo SONG (Música) ativo");
                     updatePlaylistPlayhead();
+                };
+            }
+
+            // Playlist Add Track
+            const btnPlAddTrack = document.getElementById('btn-playlist-add-track');
+            if (btnPlAddTrack) {
+                btnPlAddTrack.onclick = () => {
+                    playlistTracksCount++;
+                    renderPlaylist();
+                    showToast(`Trilha ${playlistTracksCount} adicionada!`);
                 };
             }
 
