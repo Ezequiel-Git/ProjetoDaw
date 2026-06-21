@@ -2541,11 +2541,31 @@
                         <div class="channel-rack" style="display: flex; flex-direction: column; gap: 15px; height: 100%;">
                             <div class="card-header" style="background: none; border: none; padding: 0 0 10px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
                                 <div class="card-title" style="font-size: 0.85rem; color: var(--glow-orange);">FL PIANO ROLL EDITOR / MELODIA</div>
-                                <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                     <label style="font-size: 0.75rem; color: var(--text-secondary);">Canal:</label>
                                     <select id="piano-roll-channel-select" style="background:#07070a; border:1px solid var(--border-daw); color:white; padding:4px 8px; border-radius:4px; outline:none; font-family:'Orbitron', sans-serif; font-size:0.75rem;">
                                         <!-- Carregado via JS -->
                                     </select>
+                                    
+                                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 5px;">Snap:</label>
+                                    <select id="piano-roll-snap" style="background:#07070a; border:1px solid var(--border-daw); color:white; padding:4px 8px; border-radius:4px; outline:none; font-family:'Orbitron', sans-serif; font-size:0.75rem;">
+                                        <option value="1">Nenhum (1/16)</option>
+                                        <option value="2">1/2 Beat (1/8)</option>
+                                        <option value="4">Beat (1/4)</option>
+                                        <option value="16">Compasso (1 Bar)</option>
+                                    </select>
+                                    
+                                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 5px;">Duração:</label>
+                                    <select id="piano-roll-duration" style="background:#07070a; border:1px solid var(--border-daw); color:white; padding:4px 8px; border-radius:4px; outline:none; font-family:'Orbitron', sans-serif; font-size:0.75rem;">
+                                        <option value="1">1 Step</option>
+                                        <option value="2">2 Steps</option>
+                                        <option value="4">4 Steps (1 Beat)</option>
+                                        <option value="8">8 Steps</option>
+                                        <option value="16">16 Steps (1 Bar)</option>
+                                    </select>
+
+                                    <button class="btn-action" id="btn-piano-undo" style="padding: 4px 8px; font-size: 0.7rem; background: #222; color: #aaa; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-family: 'Orbitron', sans-serif; cursor: pointer;">↩ UNDO</button>
+                                    <button class="btn-action" id="btn-piano-redo" style="padding: 4px 8px; font-size: 0.7rem; background: #222; color: #aaa; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; font-family: 'Orbitron', sans-serif; cursor: pointer;">↪ REDO</button>
                                     <button class="btn-action" id="btn-clear-pianoroll" style="padding: 4px 8px; font-size: 0.7rem; background: var(--glow-magenta); color: white; border-radius: 4px; font-family: 'Orbitron', sans-serif;">LIMPAR</button>
                                 </div>
                             </div>
@@ -6292,17 +6312,14 @@
                                 }
                             }
                         } else if (clip.type === 'automation') {
-                            // Automação simples: modula o volume do canal de 100% no início do compasso para 0% no final
                             const autoData = playlistAutomations[clip.id];
                             if (autoData) {
-                                const ratio = stepIdxInBar / 15; // 0 a 1
-                                let val = 0.8;
-                                if (clip.id === 'lead_vol') {
-                                    val = 0.8 * (1.0 - ratio); // Fade out linear
-                                } else {
-                                    val = 0.8 * ratio; // Fade in linear
-                                }
-                                updateChannelVolume(autoData.target, val);
+                                const startStep = clip.bar * 16;
+                                const durationSteps = clip.duration * 16;
+                                const t = Math.max(0.0, Math.min(1.0, (stepNumber - startStep) / durationSteps));
+                                
+                                const val = interpolateAutomationValue(autoData, t);
+                                applyAutomationValue(autoData.target, autoData.param, val);
                             }
                         }
                     }
@@ -6494,6 +6511,7 @@
                     }
 
                     led.addEventListener('click', () => {
+                        pushHistory();
                         led.classList.toggle('active');
                         if (isDrumType(chan.type)) {
                             chan.steps[i] = led.classList.contains('active');
@@ -6821,43 +6839,57 @@
                     }
                     
                     cell.onclick = () => {
-                        if (cell.classList.contains('active')) {
-                            cell.classList.remove('active');
-                            if (typeof chan.steps[i] === 'string') {
-                                let notes = chan.steps[i].split('+');
-                                notes = notes.filter(n => n !== note);
-                                if (notes.length > 0) {
-                                    chan.steps[i] = notes.join('+');
-                                } else {
-                                    chan.steps[i] = false;
-                                }
-                            } else {
-                                chan.steps[i] = false;
+                        const snapValue = parseInt(document.getElementById('piano-roll-snap').value) || 1;
+                        let clickIdx = i;
+                        if (snapValue > 1) {
+                            clickIdx = Math.round(i / snapValue) * snapValue;
+                            if (clickIdx >= sequencerSteps) {
+                                clickIdx = sequencerSteps - snapValue;
                             }
-                        } else {
-                            cell.classList.add('active');
-                            if (isDrumType(chan.type)) {
-                                chan.steps[i] = true;
-                                initAudioEngine();
-                                if (audioCtx) {
-                                    if (audioCtx.state === 'suspended') audioCtx.resume();
-                                    triggerChannelSynth(audioCtx, audioCtx.currentTime, 0, chan, mixer[chId] || mixer.master);
+                        }
+                        
+                        pushHistory(); // Salva estado no histórico para desfazer
+
+                        const durationValue = parseInt(document.getElementById('piano-roll-duration').value) || 1;
+                        const cellIsActive = cell.classList.contains('active');
+                        
+                        for (let dIdx = 0; dIdx < durationValue; dIdx++) {
+                            const stepIdx = clickIdx + dIdx;
+                            if (stepIdx >= sequencerSteps) break;
+                            
+                            if (cellIsActive) {
+                                // Remove a nota nos passos de duração
+                                if (typeof chan.steps[stepIdx] === 'string') {
+                                    let notes = chan.steps[stepIdx].split('+');
+                                    notes = notes.filter(n => n !== note);
+                                    chan.steps[stepIdx] = notes.length > 0 ? notes.join('+') : false;
+                                } else {
+                                    chan.steps[stepIdx] = false;
                                 }
                             } else {
-                                if (typeof chan.steps[i] === 'string') {
-                                    let notes = chan.steps[i].split('+');
-                                    if (!notes.includes(note)) {
-                                        notes.push(note);
-                                    }
-                                    chan.steps[i] = notes.join('+');
+                                // Adiciona a nota nos passos de duração
+                                if (isDrumType(chan.type)) {
+                                    chan.steps[stepIdx] = true;
                                 } else {
-                                    chan.steps[i] = note;
+                                    if (typeof chan.steps[stepIdx] === 'string') {
+                                        let notes = chan.steps[stepIdx].split('+');
+                                        if (!notes.includes(note)) {
+                                            notes.push(note);
+                                        }
+                                        chan.steps[stepIdx] = notes.join('+');
+                                    } else {
+                                        chan.steps[stepIdx] = note;
+                                    }
                                 }
-                                initAudioEngine();
-                                if (audioCtx) {
-                                    if (audioCtx.state === 'suspended') audioCtx.resume();
-                                    triggerChannelSynth(audioCtx, audioCtx.currentTime, noteToFreq(note), chan, mixer[chId] || mixer.master);
-                                }
+                            }
+                        }
+                        
+                        // Executa som do sintetizador ao desenhar a nota
+                        if (!cellIsActive) {
+                            initAudioEngine();
+                            if (audioCtx) {
+                                if (audioCtx.state === 'suspended') audioCtx.resume();
+                                triggerChannelSynth(audioCtx, audioCtx.currentTime, isDrumType(chan.type) ? 0 : noteToFreq(note), chan, mixer[chId] || mixer.master);
                             }
                         }
                         
@@ -7323,6 +7355,111 @@
             }
         }
 
+        // --- SISTEMA DE HISTÓRICO UNDO / REDO ---
+        let undoStack = [];
+        let redoStack = [];
+
+        function pushHistory() {
+            const snapshot = {};
+            Object.keys(channels).forEach(chId => {
+                snapshot[chId] = [...channels[chId].steps];
+            });
+            undoStack.push(snapshot);
+            if (undoStack.length > 50) {
+                undoStack.shift();
+            }
+            redoStack = []; // Limpa redo ao fazer nova alteração
+        }
+
+        function undo() {
+            if (undoStack.length === 0) return;
+            const current = {};
+            Object.keys(channels).forEach(chId => {
+                current[chId] = [...channels[chId].steps];
+            });
+            redoStack.push(current);
+            
+            const previous = undoStack.pop();
+            Object.keys(previous).forEach(chId => {
+                if (channels[chId]) {
+                    channels[chId].steps = previous[chId];
+                }
+            });
+            
+            const code = generateCodeFromSequencer();
+            playCodeDirectly(code);
+            renderDAW();
+        }
+
+        function redo() {
+            if (redoStack.length === 0) return;
+            const current = {};
+            Object.keys(channels).forEach(chId => {
+                current[chId] = [...channels[chId].steps];
+            });
+            undoStack.push(current);
+            
+            const nextState = redoStack.pop();
+            Object.keys(nextState).forEach(chId => {
+                if (channels[chId]) {
+                    channels[chId].steps = nextState[chId];
+                }
+            });
+            
+            const code = generateCodeFromSequencer();
+            playCodeDirectly(code);
+            renderDAW();
+        }
+
+        function applyAutomationValue(chId, param, val) {
+            const chan = channels[chId];
+            if (!chan) return;
+            
+            if (param === 'volume') {
+                updateChannelVolume(chId, val);
+                const fader = document.getElementById(`fader-${chId}`);
+                if (fader) fader.value = val;
+            } else {
+                if (!chan.synthSettings) chan.synthSettings = {};
+                chan.synthSettings[param] = val;
+                
+                if (chId === selectedChannelId) {
+                    const slider = document.getElementById(`knob-${param}`);
+                    if (slider) {
+                        slider.value = val;
+                        const valEl = document.getElementById(`val-${param}`);
+                        if (valEl) {
+                            if (param === 'cutoff') valEl.innerText = Math.round(val) + 'Hz';
+                            else if (param === 'resonance') valEl.innerText = val.toFixed(1);
+                            else if (param === 'delayMix') valEl.innerText = Math.floor(val * 100) + '%';
+                        }
+                    }
+                    if (['attack', 'decay', 'sustain', 'release'].includes(param)) {
+                        drawADSR();
+                    }
+                }
+            }
+        }
+
+        function interpolateAutomationValue(autoData, t) {
+            const pts = autoData.points || [{x: 0, y: 0.5}, {x: 1, y: 0.5}];
+            // Clona para evitar modificar a ordem original indevidamente durante a leitura
+            const sortedPts = [...pts].sort((a, b) => a.x - b.x);
+            
+            if (t <= sortedPts[0].x) return sortedPts[0].y;
+            if (t >= sortedPts[sortedPts.length - 1].x) return sortedPts[sortedPts.length - 1].y;
+            
+            for (let i = 0; i < sortedPts.length - 1; i++) {
+                const p1 = sortedPts[i];
+                const p2 = sortedPts[i+1];
+                if (t >= p1.x && t <= p2.x) {
+                    const fraction = (t - p1.x) / (p2.x - p1.x);
+                    return p1.y + fraction * (p2.y - p1.y);
+                }
+            }
+            return sortedPts[0].y;
+        }
+
         let activeAdsrHandle = null;
         let hoveredAdsrHandle = null;
 
@@ -7421,6 +7558,84 @@
                 ctx.fill();
                 ctx.stroke();
             });
+        }
+
+        // --- INTEGRAÇÃO WEB MIDI API PARA CONTROLADORES FÍSICOS ---
+        function initMIDI() {
+            if (navigator.requestMIDIAccess) {
+                navigator.requestMIDIAccess()
+                    .then(onMIDISuccess, onMIDIFailure);
+            } else {
+                console.warn("Web MIDI API não é suportada por este navegador.");
+            }
+        }
+
+        function onMIDISuccess(midiAccess) {
+            console.log("Acesso ao MIDI obtido com sucesso.");
+            for (let input of midiAccess.inputs.values()) {
+                input.onmidimessage = getMIDIMessage;
+            }
+            
+            midiAccess.onstatechange = (e) => {
+                if (e.port.type === 'input') {
+                    console.log(`Dispositivo MIDI ${e.port.name}: ${e.port.state}`);
+                    if (e.port.state === 'connected') {
+                        e.port.onmidimessage = getMIDIMessage;
+                        showToast(`MIDI Conectado: ${e.port.name}`);
+                    }
+                }
+            };
+        }
+
+        function onMIDIFailure() {
+            console.warn("Falha ao inicializar Web MIDI.");
+        }
+
+        function getMIDIMessage(message) {
+            const command = message.data[0] & 0xf0;
+            const note = message.data[1];
+            const velocity = message.data[2];
+            
+            if (command === 0x90 && velocity > 0) {
+                // Note On
+                playMIDINote(note, velocity);
+            }
+        }
+
+        function midiNoteToName(midiNote) {
+            const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+            const octave = Math.floor(midiNote / 12) - 1;
+            const noteName = notes[midiNote % 12];
+            return noteName + octave;
+        }
+
+        function playMIDINote(midiNote, velocity) {
+            const noteName = midiNoteToName(midiNote);
+            initAudioEngine();
+            
+            const chan = channels[selectedChannelId];
+            if (!chan) return;
+            
+            if (audioCtx) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const freq = noteToFreq(noteName);
+                triggerChannelSynth(audioCtx, audioCtx.currentTime, freq, chan, mixer[selectedChannelId] || mixer.master);
+                
+                // Feedback visual nas teclas do teclado virtual
+                const keys = document.querySelectorAll('.piano-key');
+                keys.forEach(key => {
+                    if (key.innerText === noteName) {
+                        key.style.background = 'var(--glow-orange)';
+                        key.style.boxShadow = '0 0 15px var(--glow-orange)';
+                        setTimeout(() => {
+                            const isBlack = noteName.includes('#');
+                            key.style.background = isBlack ? '#13131a' : '#ffffff';
+                            key.style.boxShadow = 'none';
+                        }, 250);
+                    }
+                });
+            }
         }
 
         // Setup ADSR interactive mouse listeners
@@ -8367,14 +8582,12 @@
                                     } else if (clip.type === 'automation') {
                                         const autoData = playlistAutomations[clip.id];
                                         if (autoData) {
-                                            const ratio = stepIdxInBar / 15;
-                                            let val = 0.8;
-                                            if (clip.id === 'lead_vol') {
-                                                val = 0.8 * (1.0 - ratio);
-                                            } else {
-                                                val = 0.8 * ratio;
-                                            }
-                                            if (offlineMixer[autoData.target]) {
+                                            const startStep = clip.bar * 16;
+                                            const durationSteps = clip.duration * 16;
+                                            const t = Math.max(0.0, Math.min(1.0, (stepNumber - startStep) / durationSteps));
+                                            
+                                            const val = interpolateAutomationValue(autoData, t);
+                                            if (autoData.param === 'volume' && offlineMixer[autoData.target]) {
                                                 offlineMixer[autoData.target].gain.setValueAtTime(val, time - chunkStartTime);
                                             }
                                         }
@@ -10237,15 +10450,38 @@
                 } else if (clip.type === 'pattern') {
                     previewContent = `<canvas class="playlist-clip-preview-canvas" id="canvas-clip-${index}"></canvas>`;
                 } else {
-                    previewContent = `
-                        <svg class="playlist-clip-preview-canvas" style="display:block; height:40px; width:100%;" viewBox="0 0 100 40" preserveAspectRatio="none">
-                            <path d="M 0 35 L 30 15 L 70 25 L 100 5" fill="none" stroke="var(--glow-green)" stroke-width="2" />
-                            <circle cx="0" cy="35" r="3" fill="var(--glow-green)" />
-                            <circle cx="30" cy="15" r="3" fill="var(--glow-green)" />
-                            <circle cx="70" cy="25" r="3" fill="var(--glow-green)" />
-                            <circle cx="100" cy="5" r="3" fill="var(--glow-green)" />
-                        </svg>
-                    `;
+                    const autoData = playlistAutomations[clip.id];
+                    if (autoData) {
+                        let pathD = '';
+                        let circlesHtml = '';
+                        const pts = autoData.points || [{x:0, y:0.5}, {x:1, y:0.5}];
+                        
+                        pts.sort((a,b) => a.x - b.x).forEach((pt, pIdx) => {
+                            let yNorm = pt.y;
+                            if (autoData.param === 'volume') yNorm = pt.y / 1.5;
+                            else if (autoData.param === 'cutoff') yNorm = (pt.y - 100) / 4900;
+                            else if (autoData.param === 'resonance') yNorm = pt.y / 10;
+                            else if (autoData.param === 'delayMix') yNorm = pt.y;
+                            
+                            yNorm = Math.max(0, Math.min(1.0, yNorm));
+                            const px = pt.x * 100;
+                            const py = 40 - (yNorm * 30 + 5);
+                            
+                            if (pIdx === 0) {
+                                pathD += `M ${px} ${py}`;
+                            } else {
+                                pathD += ` L ${px} ${py}`;
+                            }
+                            circlesHtml += `<circle cx="${px}" cy="${py}" r="3.5" fill="var(--glow-green)" class="auto-point" data-clip-id="${clip.id}" data-pt-idx="${pIdx}" style="cursor: ns-resize;" />`;
+                        });
+                        
+                        previewContent = `
+                            <svg class="playlist-clip-preview-canvas" style="display:block; height:40px; width:100%; overflow:visible;" viewBox="0 0 100 40" preserveAspectRatio="none">
+                                <path d="${pathD}" fill="none" stroke="var(--glow-green)" stroke-width="2" />
+                                ${circlesHtml}
+                            </svg>
+                        `;
+                    }
                 }
 
                 clipEl.innerHTML = `
@@ -10254,6 +10490,9 @@
                 `;
 
                 clipEl.onclick = (e) => {
+                    // Evita disparar ao clicar e arrastar os nós de automação
+                    if (e.target.classList.contains('auto-point')) return;
+                    
                     e.stopPropagation();
                     if (playlistTool === 'erase') {
                         playlistClips.splice(index, 1);
@@ -10264,6 +10503,91 @@
                 };
 
                 lane.appendChild(clipEl);
+
+                // Registrar ouvintes de arraste para pontos de automação
+                if (clip.type === 'automation') {
+                    const points = clipEl.querySelectorAll('.auto-point');
+                    points.forEach(ptNode => {
+                        ptNode.addEventListener('mousedown', (e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            
+                            const ptIdx = parseInt(ptNode.getAttribute('data-pt-idx'));
+                            const clipId = ptNode.getAttribute('data-clip-id');
+                            const autoData = playlistAutomations[clipId];
+                            
+                            function onMouseMove(moveEvent) {
+                                const rect = clipEl.getBoundingClientRect();
+                                let rx = (moveEvent.clientX - rect.left) / rect.width;
+                                let ry = 1.0 - (moveEvent.clientY - rect.top) / rect.height;
+                                
+                                rx = Math.max(0.0, Math.min(1.0, rx));
+                                ry = Math.max(0.0, Math.min(1.0, ry));
+                                
+                                if (autoData) {
+                                    let val = ry;
+                                    if (autoData.param === 'volume') val = ry * 1.5;
+                                    else if (autoData.param === 'cutoff') val = 100 + ry * 4900;
+                                    else if (autoData.param === 'resonance') val = ry * 10;
+                                    
+                                    if (ptIdx === 0) rx = 0;
+                                    else if (ptIdx === autoData.points.length - 1) rx = 1;
+                                    
+                                    autoData.points[ptIdx].x = rx;
+                                    autoData.points[ptIdx].y = val;
+                                    
+                                    autoData.points.sort((a, b) => a.x - b.x);
+                                    
+                                    renderPlaylist();
+                                }
+                            }
+                            
+                            function onMouseUp() {
+                                window.removeEventListener('mousemove', onMouseMove);
+                                window.removeEventListener('mouseup', onMouseUp);
+                            }
+                            
+                            window.addEventListener('mousemove', onMouseMove);
+                            window.addEventListener('mouseup', onMouseUp);
+                        });
+                        
+                        // Clique direito para deletar o ponto
+                        ptNode.addEventListener('contextmenu', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const ptIdx = parseInt(ptNode.getAttribute('data-pt-idx'));
+                            const clipId = ptNode.getAttribute('data-clip-id');
+                            const autoData = playlistAutomations[clipId];
+                            if (autoData && autoData.points.length > 2) {
+                                autoData.points.splice(ptIdx, 1);
+                                renderPlaylist();
+                            }
+                        });
+                    });
+                    
+                    // Duplo clique para adicionar um ponto
+                    clipEl.addEventListener('dblclick', (e) => {
+                        e.stopPropagation();
+                        const rect = clipEl.getBoundingClientRect();
+                        let rx = (e.clientX - rect.left) / rect.width;
+                        let ry = 1.0 - (e.clientY - rect.top) / rect.height;
+                        
+                        rx = Math.max(0.01, Math.min(0.99, rx));
+                        ry = Math.max(0.0, Math.min(1.0, ry));
+                        
+                        const autoData = playlistAutomations[clip.id];
+                        if (autoData) {
+                            let val = ry;
+                            if (autoData.param === 'volume') val = ry * 1.5;
+                            else if (autoData.param === 'cutoff') val = 100 + ry * 4900;
+                            else if (autoData.param === 'resonance') val = ry * 10;
+                            
+                            autoData.points.push({ x: rx, y: val });
+                            autoData.points.sort((a, b) => a.x - b.x);
+                            renderPlaylist();
+                        }
+                    });
+                }
 
                 if (clip.type === 'audio' && playlistAudioClips[clip.id]) {
                     setTimeout(() => {
@@ -10735,6 +11059,7 @@
                     if (select) {
                         const chId = select.value;
                         if (channels[chId]) {
+                            pushHistory(); // Salva estado para poder desfazer a limpeza
                             channels[chId].steps.fill(false);
                             const code = generateCodeFromSequencer();
                             playCodeDirectly(code);
@@ -10744,6 +11069,25 @@
                     }
                 };
             }
+
+            // Vincular botões do histórico
+            const btnUndo = document.getElementById('btn-piano-undo');
+            if (btnUndo) btnUndo.onclick = undo;
+            const btnRedo = document.getElementById('btn-piano-redo');
+            if (btnRedo) btnRedo.onclick = redo;
+
+            // Atalhos de teclado para Desfazer/Refazer
+            window.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'z') {
+                    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+                    e.preventDefault();
+                    undo();
+                } else if ((e.ctrlKey && e.key.toLowerCase() === 'y') || (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'z')) {
+                    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+                    e.preventDefault();
+                    redo();
+                }
+            });
 
             // Invalidação de Cache de Sessão para a nova versão de Instrumentos
             try {
@@ -10968,6 +11312,9 @@
 
             // Start VU meter tracking
             startVuMetersLoop();
+            
+            // Inicializa conexão MIDI
+            initMIDI();
         });
     </script>
 
