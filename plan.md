@@ -30,9 +30,12 @@ Este plano detalha o estado atual da DAW customizada contida no arquivo [index.h
    - **Ações de Projeto (Save/Load/Export):** CSS limpo com as classes `.btn-save`, `.btn-load`, `.btn-export` contendo sombras e reflexos modernos.
 
 6. **[RESOLVIDO] Sincronização Automática Editor ➔ Playlist**:
-   - **Geração Automática de Clipes:** Sempre que você escrever ou compilar código no editor (como os longos loops de Kick/Perc que você criou), a DAW irá criar automaticamente clipes de padrões correspondentes na Playlist no **tempo e compasso corretos**.
-   - **Redimensionamento Dinâmico da Timeline:** Se o padrão compilado tiver uma duração muito longa (por exemplo, 48 ou 160 passos), a quantidade de barras da timeline (`playlistBarsCount`) e as linhas do grid visual se adaptam automaticamente para caber toda a sequência sem cortar.
-   - **Preservação de Edições Manuais:** Se você desenhar blocos extras manualmente na timeline, suas posições são preservadas, apenas atualizando suas durações e canais quando o código for recompilado.
+   - **Geração Automática de Clipes:** Sempre que você escrever ou compilar código no editor, a DAW cria automaticamente clipes de padrões correspondentes na Playlist no **tempo e compasso corretos**.
+   - **Redimensionamento Dinâmico da Timeline:** A timeline e o grid visual se adaptam automaticamente para caber toda a sequência do código de forma dinâmica.
+
+7. **[RESOLVIDO] Correções de Playback e Adição de Trilhas na Playlist**:
+   - **Playhead Sincronizado e Inteligente:** Corrigido o bug em que o playhead voltava após 4 compassos no modo PAT (Pattern), mesmo quando o padrão do usuário era maior. Agora o playhead usa o `visualStep` sincronizado com o Web Audio Context e calcula dinamicamente o ponto de retorno baseado no tamanho real dos passos do padrão compilado (`maxSteps`), e avança linearmente no modo SONG.
+   - **Botão ADD TRACK:** Adicionado um botão interativo na barra da Playlist que permite criar dinamicamente novas trilhas de arranjo com um único clique.
 
 ---
 
