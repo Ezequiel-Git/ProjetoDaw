@@ -9122,7 +9122,26 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                         setEditorTabMode('new');
                         document.getElementById('code-editor').value = defaultSong.code.trim();
                         document.getElementById('music-name').value = "Cybernetic Neon Drift";
-                        activeParsedCode = parseDAWCode(defaultSong.code.trim(), true);
+                        try {
+                            activeParsedCode = parseDAWCode(defaultSong.code.trim(), true);
+                        } catch (parseErr) {
+                            console.warn("Cached default song in localStorage is corrupted or uses old syntax. Re-seeding clean preset...", parseErr);
+                            const response = await fetch(PRESETS_URL);
+                            if (response.ok) {
+                                const allPresets = await response.json();
+                                const p = allPresets.find(pr => pr.id === 'cyberdrift');
+                                if (p) {
+                                    document.getElementById('code-editor').value = p.code.trim();
+                                    activeParsedCode = parseDAWCode(p.code.trim(), true);
+                                    const filtered = savedSongs.filter(s => s.name !== "Cybernetic Neon Drift" && s.name !== "Musica");
+                                    filtered.push({
+                                        name: "Cybernetic Neon Drift",
+                                        code: p.code.trim()
+                                    });
+                                    localStorage.setItem('strudel_songs', JSON.stringify(filtered));
+                                }
+                            }
+                        }
                         if (activeParsedCode && activeParsedCode.bpm) {
                             document.getElementById('bpm-slider').value = activeParsedCode.bpm;
                             document.getElementById('display-bpm').innerText = activeParsedCode.bpm;
