@@ -131,6 +131,7 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
         let playlistBarsCount = 32;
         let playlistMediaRecorder = null;
         let playlistRecordedChunks = [];
+        let startPlayTime = 0;
 
         // --- CANAIS DINÂMICOS (ESTADO DA DAW COM SYNTHS VIRTUAIS/PLUGINS) ---
         let sequencerSteps = 16;
@@ -5863,6 +5864,7 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
 
         // --- RENDERIZADOR DE ÁUDIO EM PEDAÇOS (CHUNKED OFFLINE RENDERER) ---
         async function renderAudioInChunks(parsed, totalSteps, stepDuration, totalDuration, sampleRate, onProgress) {
+            const bpm = parsed.bpm || 120;
             // Sincronizar dinamicamente a duração dos clipes de padrão com a duração real dos padrões dos canais
             playlistClips.forEach(clip => {
                 if (clip.type === 'pattern') {
