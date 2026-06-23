@@ -2283,3 +2283,67 @@
             background-size: 100% 100%, calc(100% / 32) 100%;
             pointer-events: none;
         }
+
+/* NEW PREMIUM THEMES VARIABLES */
+:root {
+  --transition-speed: 0.3s;
+}
+
+body.theme-matrix {
+  --bg-dark: #000400;
+  --panel-bg: rgba(0, 15, 0, 0.85);
+  --panel-header: rgba(0, 25, 0, 0.95);
+  --border-daw: rgba(0, 255, 0, 0.18);
+  --glow-orange: #00ff00;
+  --glow-cyan: #00ff66;
+  --glow-green: #39e75f;
+  --glow-magenta: #00ff00;
+  --glow-yellow: #a3ff05;
+  --text-primary: #00ff33;
+  --text-secondary: #008822;
+}
+
+body.theme-ice {
+  --bg-dark: #020813;
+  --panel-bg: rgba(10, 24, 45, 0.75);
+  --panel-header: rgba(16, 37, 66, 0.9);
+  --border-daw: rgba(0, 229, 255, 0.15);
+  --glow-orange: #00e5ff;
+  --glow-cyan: #00aaff;
+  --glow-green: #00ffd5;
+  --glow-magenta: #7b2cbf;
+  --glow-yellow: #00f0ff;
+  --text-primary: #e0f7fa;
+  --text-secondary: #80deea;
+}
+
+body.theme-red {
+  --bg-dark: #050000;
+  --panel-bg: rgba(26, 0, 0, 0.85);
+  --panel-header: rgba(45, 0, 0, 0.95);
+  --border-daw: rgba(255, 0, 0, 0.22);
+  --glow-orange: #ff0000;
+  --glow-cyan: #ff3333;
+  --glow-green: #ff5555;
+  --glow-magenta: #d90429;
+  --glow-yellow: #ef233c;
+  --text-primary: #ffe3e3;
+  --text-secondary: #d90429;
+}
+
+.editor-help-panel.collapsed {
+  width: 0px !important;
+  padding: 0px !important;
+  border: none !important;
+  opacity: 0;
+  pointer-events: none;
+  margin-left: -15px;
+}
+.btn-snippet:hover {
+  background: #1d1d2f !important;
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+  transform: translateY(-1px);
+}
+.accordion-header:hover {
+  background: rgba(255,255,255,0.08) !important;
+}

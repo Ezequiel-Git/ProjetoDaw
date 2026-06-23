@@ -108,6 +108,12 @@
                     <option value="acid">Acid Lime</option>
                     <option value="synthwave">Synthwave</option>
                     <option value="deepspace">Deep Space</option>
+                    <option value="matrix">Matrix Green</option>
+                    <option value="ice">Glacial Blue</option>
+                    <option value="red">Cyberpunk Red</option>
+                    <option value="matrix">Matrix Green</option>
+                    <option value="ice">Glacial Blue</option>
+                    <option value="red">Cyberpunk Red</option>
                 </select>
             </div>
 
@@ -153,8 +159,9 @@
                 </div>
 
                 <!-- Conteúdo Aba 1: Editor de Código -->
-                <section class="workspace-content" id="wcontent-editor" style="display: flex;">
-                    <div class="editor-card">
+                <section class="workspace-content" id="wcontent-editor" style="display: flex; flex-direction: row; gap: 15px; padding: 20px; overflow-y: auto;">
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 15px;">
+                        <div class="editor-card">
                         <div class="card-header">
                             <div class="card-title">PIANO ROLL / STRUDEL CODE EDITOR</div>
                             <span style="font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.75rem; color: var(--glow-green);">SYNTH: ACTIVE</span>
@@ -177,10 +184,52 @@
                     </div>
 
                     <!-- Console de Diagnóstico -->
-                    <div id="cyber-console" class="info-panel cyber-console-container" style="border: 1px solid rgba(0, 229, 255, 0.2); background: rgba(8, 8, 12, 0.92); padding: 12px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.05); margin-top: 15px;">
-                        <strong style="color: var(--glow-cyan); font-family: 'Orbitron', sans-serif; font-size: 0.75rem; letter-spacing: 1.2px;">🛰️ SYSTEM LOGS & DAW DIAGNOSTICS:</strong>
-                        <div id="console-output" style="max-height: 110px; overflow-y: auto; font-family: 'Fira Code', monospace; font-size: 0.8rem; margin-top: 8px; color: var(--text-primary); white-space: pre-wrap; line-height: 1.4;"></div>
+                        <div id="cyber-console" class="info-panel cyber-console-container" style="border: 1px solid rgba(0, 229, 255, 0.2); background: rgba(8, 8, 12, 0.92); padding: 12px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.05); margin-top: 15px;">
+                            <strong style="color: var(--glow-cyan); font-family: 'Orbitron', sans-serif; font-size: 0.75rem; letter-spacing: 1.2px;">🛰️ SYSTEM LOGS & DAW DIAGNOSTICS:</strong>
+                            <div id="console-output" style="max-height: 110px; overflow-y: auto; font-family: 'Fira Code', monospace; font-size: 0.8rem; margin-top: 8px; color: var(--text-primary); white-space: pre-wrap; line-height: 1.4;"></div>
+                        </div>
                     </div>
+                    
+                    <!-- Painel de Ajuda Lateral Retrátil -->
+                    <div id="editor-help-panel" class="editor-help-panel" style="width: 300px; display: flex; flex-direction: column; background: var(--panel-bg); border: 1px solid var(--border-daw); border-radius: 12px; padding: 16px; max-height: calc(100vh - 200px); overflow-y: auto; box-shadow: 0 6px 20px rgba(0,0,0,0.4); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-daw); padding-bottom: 8px; margin-bottom: 12px;">
+                            <span style="font-family:'Orbitron', sans-serif; font-size:0.8rem; color:var(--glow-cyan); font-weight:bold; letter-spacing:1px;">💡 AJUDA E SNIPPETS</span>
+                            <button id="btn-toggle-help" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:0.75rem; font-weight:bold; outline:none;">[ FECHAR ]</button>
+                        </div>
+                        
+                        <div class="help-accordion" style="display:flex; flex-direction:column; gap:10px;">
+                            <div class="help-section">
+                                <button class="accordion-header" style="width:100%; text-align:left; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); color:white; padding:8px 10px; border-radius:6px; font-family:'Orbitron', sans-serif; font-size:0.72rem; font-weight:bold; cursor:pointer; outline:none; display:flex; justify-content:space-between;">
+                                    <span>ESTRUTURA BÁSICA</span>
+                                    <span>▼</span>
+                                </button>
+                                <div class="accordion-content" style="padding:8px 4px; font-size:0.72rem; color:var(--text-secondary); line-height:1.4; display:none; flex-direction:column; gap:6px;">
+                                    <code>bpm = 125</code> define o tempo.
+                                    <br>
+                                    <code>lead = Synth("lead")</code> cria um canal.
+                                    <br>
+                                    <code>lead.play("C4 E4 G4")</code> agenda as notas. Use <code>.</code> para pausas e <code>x</code> para batidas.
+                                </div>
+                            </div>
+                            
+                            <div class="help-section">
+                                <button class="accordion-header" style="width:100%; text-align:left; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); color:white; padding:8px 10px; border-radius:6px; font-family:'Orbitron', sans-serif; font-size:0.72rem; font-weight:bold; cursor:pointer; outline:none; display:flex; justify-content:space-between;">
+                                    <span>SNIPPETS DE CÓDIGO</span>
+                                    <span>▼</span>
+                                </button>
+                                <div class="accordion-content" style="padding:8px 4px; font-size:0.72rem; display:none; flex-direction:column; gap:8px;">
+                                    <button class="btn-snippet" data-code="bpm = 125\n\nkick = Synth('kick')\nkick.oscillator = 'kick'\nkick.setEnvelope(0.00, 0.15, 0.00, 0.10)\nkick.play('x . . . x . . . x . . . x . . .')" style="background:#13131e; border:1px solid var(--border-daw); color:var(--glow-orange); padding:6px; border-radius:4px; text-align:left; font-family:monospace; font-size:0.7rem; cursor:pointer; width:100%;">🥁 Beat 4/4 Techno</button>
+                                    
+                                    <button class="btn-snippet" data-code="lead = Synth('lead')\nlead.oscillator = 'sawtooth'\nlead.setEnvelope(0.05, 0.20, 0.30, 0.15)\nlead.setFilter(1200, 2.0)\nlead.setEQ(2.0, -1.0, 3.5)\nlead.play('C4 . E4 . G4 . B4 . arpeggiate([C4, E4, G4], \'up\')')" style="background:#13131e; border:1px solid var(--border-daw); color:var(--glow-cyan); padding:6px; border-radius:4px; text-align:left; font-family:monospace; font-size:0.7rem; cursor:pointer; width:100%;">🎹 Linha de Lead Synth</button>
+                                    
+                                    <button class="btn-snippet" data-code="bass = Synth('bass')\nbass.oscillator = 'sawtooth'\nbass.setEnvelope(0.02, 0.18, 0.40, 0.10)\nbass.setFilter(600, 4.0)\nbass.setPhaser(0.5, 2.5)\nbass.play('C3 C3 . C3 C3 . Eb3 .')" style="background:#13131e; border:1px solid var(--border-daw); color:var(--glow-yellow); padding:6px; border-radius:4px; text-align:left; font-family:monospace; font-size:0.7rem; cursor:pointer; width:100%;">🎸 Bassline com Phaser</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botão Flutuante para reabrir painel de ajuda se fechado -->
+                    <button id="btn-open-help" class="btn-action" style="position: absolute; right: 20px; top: 20px; display: none; z-index: 10; padding: 4px 8px; font-size: 0.7rem;">[ ABRIR AJUDA ]</button>
                 </section>
 
                 <!-- Conteúdo Aba 2: Step Sequencer & Plugins Settings -->
@@ -192,6 +241,10 @@
                             <div class="card-header" style="background: none; border: none; padding: 0 0 10px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
                                 <div class="card-title" style="font-size: 0.85rem; color: var(--glow-orange);">FL CHANNEL RACK / STEP SEQUENCER</div>
                                 <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button class="btn-action" id="btn-undo" title="Desfazer (Ctrl+Z)" style="padding: 4px 8px; font-size: 0.7rem; color: var(--glow-cyan); border-color: rgba(0, 229, 255, 0.3);">↩ UNDO</button>
+                                    <button class="btn-action" id="btn-redo" title="Refazer (Ctrl+Y)" style="padding: 4px 8px; font-size: 0.7rem; color: var(--glow-cyan); border-color: rgba(0, 229, 255, 0.3);">↪ REDO</button>
+                                    <button class="btn-action" id="btn-randomize-rack" title="Randomizar sequenciador" style="padding: 4px 8px; font-size: 0.7rem; color: var(--glow-yellow); border-color: rgba(255, 204, 0, 0.3);">🎲 RANDOMIZAR</button>
+                                    <div style="width: 1px; height: 16px; background: rgba(255,255,255,0.1); margin: 0 4px;"></div>
                                     <label style="font-size: 0.75rem; color: var(--text-secondary);">Total: <span id="display-total-steps" style="color: var(--glow-orange);">16</span> Passos</label>
                                     <button class="btn-action" id="btn-sub-cycles" style="padding: 4px 8px; font-size: 0.7rem; background: #13131a; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;">- 1 CICLO</button>
                                     <button class="btn-action" id="btn-add-cycles" style="padding: 4px 8px; font-size: 0.7rem; background: rgba(255, 85, 51, 0.2); border: 1px solid var(--glow-orange); border-radius: 4px;">+ 1 CICLO</button>
@@ -342,6 +395,31 @@
                                     <span>Distortion (Drive):</span>
                                     <input type="range" id="knob-distortion" min="0" max="1" step="0.05" value="0.00">
                                     <span id="val-distortion">0%</span>
+                                </div>
+                                <div class="plugin-slider-row">
+                                    <span>EQ Graves (Low):</span>
+                                    <input type="range" id="knob-eqlow" min="-12" max="12" step="0.5" value="0.0">
+                                    <span id="val-eqlow">0dB</span>
+                                </div>
+                                <div class="plugin-slider-row">
+                                    <span>EQ Médios (Mid):</span>
+                                    <input type="range" id="knob-eqmid" min="-12" max="12" step="0.5" value="0.0">
+                                    <span id="val-eqmid">0dB</span>
+                                </div>
+                                <div class="plugin-slider-row">
+                                    <span>EQ Agudos (High):</span>
+                                    <input type="range" id="knob-eqhigh" min="-12" max="12" step="0.5" value="0.0">
+                                    <span id="val-eqhigh">0dB</span>
+                                </div>
+                                <div class="plugin-slider-row">
+                                    <span>Phaser Mix:</span>
+                                    <input type="range" id="knob-phasermix" min="0" max="1" step="0.05" value="0.00">
+                                    <span id="val-phasermix">0%</span>
+                                </div>
+                                <div class="plugin-slider-row">
+                                    <span>Phaser Speed:</span>
+                                    <input type="range" id="knob-phaserspeed" min="0.1" max="10" step="0.1" value="1.0">
+                                    <span id="val-phaserspeed">1.0Hz</span>
                                 </div>
                             </div>
                         </div>
@@ -570,6 +648,41 @@
                                          <span id="val-fx-delay-feedback" style="color: var(--glow-cyan);">50%</span>
                                      </div>
                                      <input type="range" id="knob-fx-delay-feedback" min="0" max="0.95" step="0.05" value="0.5" style="accent-color: var(--glow-cyan); cursor: pointer;">
+                                 </div>
+                                 <div style="display: flex; flex-direction: column; gap: 5px;">
+                                     <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                         <span>EQ Graves (Low):</span>
+                                         <span id="val-fx-eqlow" style="color: var(--glow-cyan);">0dB</span>
+                                     </div>
+                                     <input type="range" id="knob-fx-eqlow" min="-12" max="12" step="0.5" value="0" style="accent-color: var(--glow-cyan); cursor: pointer;">
+                                 </div>
+                                 <div style="display: flex; flex-direction: column; gap: 5px;">
+                                     <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                         <span>EQ Médios (Mid):</span>
+                                         <span id="val-fx-eqmid" style="color: var(--glow-cyan);">0dB</span>
+                                     </div>
+                                     <input type="range" id="knob-fx-eqmid" min="-12" max="12" step="0.5" value="0" style="accent-color: var(--glow-cyan); cursor: pointer;">
+                                 </div>
+                                 <div style="display: flex; flex-direction: column; gap: 5px;">
+                                     <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                         <span>EQ Agudos (High):</span>
+                                         <span id="val-fx-eqhigh" style="color: var(--glow-cyan);">0dB</span>
+                                     </div>
+                                     <input type="range" id="knob-fx-eqhigh" min="-12" max="12" step="0.5" value="0" style="accent-color: var(--glow-cyan); cursor: pointer;">
+                                 </div>
+                                 <div style="display: flex; flex-direction: column; gap: 5px;">
+                                     <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                         <span>Phaser Mix:</span>
+                                         <span id="val-fx-phasermix" style="color: var(--glow-cyan);">0%</span>
+                                     </div>
+                                     <input type="range" id="knob-fx-phasermix" min="0" max="1" step="0.05" value="0" style="accent-color: var(--glow-cyan); cursor: pointer;">
+                                 </div>
+                                 <div style="display: flex; flex-direction: column; gap: 5px;">
+                                     <div style="display: flex; justify-content: space-between; font-size: 0.75rem;">
+                                         <span>Phaser Speed:</span>
+                                         <span id="val-fx-phaserspeed" style="color: var(--glow-cyan);">1.0Hz</span>
+                                     </div>
+                                     <input type="range" id="knob-fx-phaserspeed" min="0.1" max="10" step="0.1" value="1.0" style="accent-color: var(--glow-cyan); cursor: pointer;">
                                  </div>
                             </div>
                             

@@ -385,6 +385,12 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
         let channelReverbGains = {};
         let channelChorusGains = {};
         let channelDistNodes = {};
+        let channelEQHighNodes = {};
+        let channelEQMidNodes = {};
+        let channelEQLowNodes = {};
+        let channelPhaserGains = {};
+        let channelPhaserFilters = {};
+        let channelPhaserLfos = {};
         let channelAnalysers = {};
         let channelChorusLfos = {};
         let sharedReverbBuffer = null;
@@ -883,8 +889,84 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                     const dryGain = audioCtx.createGain();
                     dryGain.gain.value = 1.0;
 
-                    // Connect mixer to distortion
-                    mixer[chId].connect(distNode);
+                    if (chan.fxSettings.eqLow === undefined) chan.fxSettings.eqLow = 0.0;
+                    if (chan.fxSettings.eqMid === undefined) chan.fxSettings.eqMid = 0.0;
+                    if (chan.fxSettings.eqHigh === undefined) chan.fxSettings.eqHigh = 0.0;
+                    if (chan.fxSettings.phaserMix === undefined) chan.fxSettings.phaserMix = 0.0;
+                    if (chan.fxSettings.phaserSpeed === undefined) chan.fxSettings.phaserSpeed = 1.0;
+
+                    // EQ Nodes
+                    const eqLow = audioCtx.createBiquadFilter();
+                    eqLow.type = 'lowshelf';
+                    eqLow.frequency.value = 250;
+                    eqLow.gain.value = chan.fxSettings.eqLow;
+
+                    const eqMid = audioCtx.createBiquadFilter();
+                    eqMid.type = 'peaking';
+                    eqMid.frequency.value = 1000;
+                    eqMid.Q.value = 1.0;
+                    eqMid.gain.value = chan.fxSettings.eqMid;
+
+                    const eqHigh = audioCtx.createBiquadFilter();
+                    eqHigh.type = 'highshelf';
+                    eqHigh.frequency.value = 4000;
+                    eqHigh.gain.value = chan.fxSettings.eqHigh;
+
+                    channelEQLowNodes[chId] = eqLow;
+                    channelEQMidNodes[chId] = eqMid;
+                    channelEQHighNodes[chId] = eqHigh;
+
+                    // Phaser Nodes
+                    const phaserInput = audioCtx.createGain();
+                    const phaserDryGain = audioCtx.createGain();
+                    const phaserWetGain = audioCtx.createGain();
+                    const phaserOut = audioCtx.createGain();
+
+                    const ap1 = audioCtx.createBiquadFilter(); ap1.type = 'allpass';
+                    const ap2 = audioCtx.createBiquadFilter(); ap2.type = 'allpass';
+                    const ap3 = audioCtx.createBiquadFilter(); ap3.type = 'allpass';
+                    const ap4 = audioCtx.createBiquadFilter(); ap4.type = 'allpass';
+
+                    ap1.frequency.value = 1000;
+                    ap2.frequency.value = 1000;
+                    ap3.frequency.value = 1000;
+                    ap4.frequency.value = 1000;
+
+                    const phaserLfo = audioCtx.createOscillator();
+                    phaserLfo.frequency.value = chan.fxSettings.phaserSpeed;
+                    
+                    const phaserLfoGain = audioCtx.createGain();
+                    phaserLfoGain.gain.value = 800;
+
+                    phaserLfo.connect(phaserLfoGain);
+                    phaserLfoGain.connect(ap1.frequency);
+                    phaserLfoGain.connect(ap2.frequency);
+                    phaserLfoGain.connect(ap3.frequency);
+                    phaserLfoGain.connect(ap4.frequency);
+                    phaserLfo.start();
+
+                    phaserInput.connect(phaserDryGain);
+                    phaserInput.connect(ap1);
+                    ap1.connect(ap2);
+                    ap2.connect(ap3);
+                    ap3.connect(ap4);
+                    ap4.connect(phaserWetGain);
+
+                    phaserDryGain.connect(phaserOut);
+                    phaserWetGain.connect(phaserOut);
+
+                    phaserDryGain.gain.value = 1.0 - chan.fxSettings.phaserMix * 0.5;
+                    phaserWetGain.gain.value = chan.fxSettings.phaserMix * 0.5;
+
+                    channelPhaserLfos[chId] = phaserLfo;
+                    channelPhaserFilters[chId] = [ap1, ap2, ap3, ap4];
+                    channelPhaserGains[chId] = { dry: phaserDryGain, wet: phaserWetGain };
+
+                    mixer[chId].connect(eqLow);
+                    eqLow.connect(eqMid);
+                    eqMid.connect(eqHigh);
+                    eqHigh.connect(phaserInput);
+                    phaserOut.connect(distNode);
                     
                     // Distorted signal splits to dry, chorus, and reverb
                     distNode.connect(dryGain);
@@ -3072,8 +3154,27 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 chan.fxSettings = {
                     distortion: builder._distortion,
                     chorus: isKick ? 0.0 : builder._chorus,
-                    reverb: isKick ? 0.0 : builder._reverb
+                    reverb: isKick ? 0.0 : builder._reverb,
+                    eqLow: builder._eqLow !== undefined ? builder._eqLow : 0.0,
+                    eqMid: builder._eqMid !== undefined ? builder._eqMid : 0.0,
+                    eqHigh: builder._eqHigh !== undefined ? builder._eqHigh : 0.0,
+                    phaserMix: builder._phaserMix !== undefined ? builder._phaserMix : 0.0,
+                    phaserSpeed: builder._phaserSpeed !== undefined ? builder._phaserSpeed : 1.0
                 };
+
+                if (audioCtx) {
+                    if (channelEQLowNodes[chId]) channelEQLowNodes[chId].gain.value = builder._eqLow !== undefined ? builder._eqLow : 0.0;
+                    if (channelEQMidNodes[chId]) channelEQMidNodes[chId].gain.value = builder._eqMid !== undefined ? builder._eqMid : 0.0;
+                    if (channelEQHighNodes[chId]) channelEQHighNodes[chId].gain.value = builder._eqHigh !== undefined ? builder._eqHigh : 0.0;
+                    if (channelPhaserGains[chId]) {
+                        const pm = builder._phaserMix !== undefined ? builder._phaserMix : 0.0;
+                        channelPhaserGains[chId].dry.gain.value = 1.0 - pm * 0.5;
+                        channelPhaserGains[chId].wet.gain.value = pm * 0.5;
+                    }
+                    if (channelPhaserLfos[chId] && builder._phaserSpeed !== undefined) {
+                        channelPhaserLfos[chId].frequency.value = builder._phaserSpeed;
+                    }
+                }
 
                 if (audioCtx) {
                     if (channelReverbGains[chId]) channelReverbGains[chId].gain.value = isKick ? 0.0 : builder._reverb * 0.5;
@@ -3370,6 +3471,32 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 setHumanize(val) { this._humanizer = val; registerTrackFromBuilder(this); return this; }
                 setSustainPedal(val) { this._sustainPedal = !!val; registerTrackFromBuilder(this); return this; }
 
+                setEQ(low, mid, high) {
+                    if (typeof low === 'object' && low !== null) {
+                        this._eqLow = low.low !== undefined ? low.low : this._eqLow;
+                        this._eqMid = low.mid !== undefined ? low.mid : this._eqMid;
+                        this._eqHigh = low.high !== undefined ? low.high : this._eqHigh;
+                    } else {
+                        this._eqLow = low !== undefined ? low : this._eqLow;
+                        this._eqMid = mid !== undefined ? mid : this._eqMid;
+                        this._eqHigh = high !== undefined ? high : this._eqHigh;
+                    }
+                    registerTrackFromBuilder(this);
+                    return this;
+                }
+
+                setPhaser(mix, speed) {
+                    if (typeof mix === 'object' && mix !== null) {
+                        this._phaserMix = mix.mix !== undefined ? mix.mix : (mix.phaserMix !== undefined ? mix.phaserMix : this._phaserMix);
+                        this._phaserSpeed = mix.speed !== undefined ? mix.speed : (mix.phaserSpeed !== undefined ? mix.phaserSpeed : this._phaserSpeed);
+                    } else {
+                        this._phaserMix = mix !== undefined ? mix : this._phaserMix;
+                        this._phaserSpeed = speed !== undefined ? speed : this._phaserSpeed;
+                    }
+                    registerTrackFromBuilder(this);
+                    return this;
+                }
+
                 setFx(dist, chor, rev) {
                     if (typeof dist === 'object' && dist !== null) {
                         this._distortion = dist.distortion !== undefined ? dist.distortion : this._distortion;
@@ -3434,6 +3561,19 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 transpose: transposeNote,
                 steps: function(count) {
                     return Array.from({ length: count }, (_, i) => i);
+                },
+                arpeggiate: function(notes, type = 'up', octaves = 1) {
+                    if (!Array.isArray(notes)) return notes;
+                    let result = [];
+                    // Simple up/down arpeggiator logic
+                    if (type === 'up') {
+                        result = [...notes];
+                    } else if (type === 'down') {
+                        result = [...notes].reverse();
+                    } else {
+                        result = [...notes, ...[...notes].reverse().slice(1, -1)];
+                    }
+                    return result.join(' ');
                 },
                 preset: function(name, id) {
                     const synthId = id || name.toLowerCase().replace(/\s+/g, '_');
@@ -3991,7 +4131,12 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 fxSettings: {
                     distortion: 0.0,
                     chorus: 0.0,
-                    reverb: 0.0
+                    reverb: 0.0,
+                    eqLow: 0.0,
+                    eqMid: 0.0,
+                    eqHigh: 0.0,
+                    phaserMix: 0.0,
+                    phaserSpeed: 1.0
                 },
                 synthSettings: {
                     oscType: "triangle",
@@ -4059,11 +4204,83 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 reverbGain.gain.value = 0.0;
                 channelReverbGains[chId] = reverbGain;
 
+                // EQ Nodes
+                const eqLow = audioCtx.createBiquadFilter();
+                eqLow.type = 'lowshelf';
+                eqLow.frequency.value = 250;
+                eqLow.gain.value = chan.fxSettings.eqLow || 0;
+
+                const eqMid = audioCtx.createBiquadFilter();
+                eqMid.type = 'peaking';
+                eqMid.frequency.value = 1000;
+                eqMid.Q.value = 1.0;
+                eqMid.gain.value = chan.fxSettings.eqMid || 0;
+
+                const eqHigh = audioCtx.createBiquadFilter();
+                eqHigh.type = 'highshelf';
+                eqHigh.frequency.value = 4000;
+                eqHigh.gain.value = chan.fxSettings.eqHigh || 0;
+
+                channelEQLowNodes[chId] = eqLow;
+                channelEQMidNodes[chId] = eqMid;
+                channelEQHighNodes[chId] = eqHigh;
+
+                // Phaser Nodes
+                const phaserInput = audioCtx.createGain();
+                const phaserDryGain = audioCtx.createGain();
+                const phaserWetGain = audioCtx.createGain();
+                const phaserOut = audioCtx.createGain();
+
+                const ap1 = audioCtx.createBiquadFilter(); ap1.type = 'allpass';
+                const ap2 = audioCtx.createBiquadFilter(); ap2.type = 'allpass';
+                const ap3 = audioCtx.createBiquadFilter(); ap3.type = 'allpass';
+                const ap4 = audioCtx.createBiquadFilter(); ap4.type = 'allpass';
+
+                ap1.frequency.value = 1000;
+                ap2.frequency.value = 1000;
+                ap3.frequency.value = 1000;
+                ap4.frequency.value = 1000;
+
+                const phaserLfo = audioCtx.createOscillator();
+                phaserLfo.frequency.value = chan.fxSettings.phaserSpeed || 1.0;
+                
+                const phaserLfoGain = audioCtx.createGain();
+                phaserLfoGain.gain.value = 800;
+
+                phaserLfo.connect(phaserLfoGain);
+                phaserLfoGain.connect(ap1.frequency);
+                phaserLfoGain.connect(ap2.frequency);
+                phaserLfoGain.connect(ap3.frequency);
+                phaserLfoGain.connect(ap4.frequency);
+                phaserLfo.start();
+
+                phaserInput.connect(phaserDryGain);
+                phaserInput.connect(ap1);
+                ap1.connect(ap2);
+                ap2.connect(ap3);
+                ap3.connect(ap4);
+                ap4.connect(phaserWetGain);
+
+                phaserDryGain.connect(phaserOut);
+                phaserWetGain.connect(phaserOut);
+
+                const pmix = chan.fxSettings.phaserMix || 0.0;
+                phaserDryGain.gain.value = 1.0 - pmix * 0.5;
+                phaserWetGain.gain.value = pmix * 0.5;
+
+                channelPhaserLfos[chId] = phaserLfo;
+                channelPhaserFilters[chId] = [ap1, ap2, ap3, ap4];
+                channelPhaserGains[chId] = { dry: phaserDryGain, wet: phaserWetGain };
+
                 // Dry/Wet path
                 const dryGain = audioCtx.createGain();
                 dryGain.gain.value = 1.0;
 
-                mixer[chId].connect(distNode);
+                mixer[chId].connect(eqLow);
+                eqLow.connect(eqMid);
+                eqMid.connect(eqHigh);
+                eqHigh.connect(phaserInput);
+                phaserOut.connect(distNode);
                 
                 distNode.connect(dryGain);
                 distNode.connect(chorusDelay);
@@ -4428,6 +4645,38 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
             document.getElementById('knob-fx-distortion').value = fx.distortion;
             document.getElementById('val-fx-distortion').innerText = Math.round(fx.distortion * 100) + '%';
 
+            // EQ UI values
+            const eqLowVal = fx.eqLow !== undefined ? fx.eqLow : 0.0;
+            document.getElementById('knob-eqlow').value = eqLowVal;
+            document.getElementById('val-eqlow').innerText = eqLowVal.toFixed(1) + 'dB';
+            document.getElementById('knob-fx-eqlow').value = eqLowVal;
+            document.getElementById('val-fx-eqlow').innerText = eqLowVal.toFixed(1) + 'dB';
+
+            const eqMidVal = fx.eqMid !== undefined ? fx.eqMid : 0.0;
+            document.getElementById('knob-eqmid').value = eqMidVal;
+            document.getElementById('val-eqmid').innerText = eqMidVal.toFixed(1) + 'dB';
+            document.getElementById('knob-fx-eqmid').value = eqMidVal;
+            document.getElementById('val-fx-eqmid').innerText = eqMidVal.toFixed(1) + 'dB';
+
+            const eqHighVal = fx.eqHigh !== undefined ? fx.eqHigh : 0.0;
+            document.getElementById('knob-eqhigh').value = eqHighVal;
+            document.getElementById('val-eqhigh').innerText = eqHighVal.toFixed(1) + 'dB';
+            document.getElementById('knob-fx-eqhigh').value = eqHighVal;
+            document.getElementById('val-fx-eqhigh').innerText = eqHighVal.toFixed(1) + 'dB';
+
+            // Phaser UI values
+            const phaserMixVal = fx.phaserMix !== undefined ? fx.phaserMix : 0.0;
+            document.getElementById('knob-phasermix').value = phaserMixVal;
+            document.getElementById('val-phasermix').innerText = Math.round(phaserMixVal * 100) + '%';
+            document.getElementById('knob-fx-phasermix').value = phaserMixVal;
+            document.getElementById('val-fx-phasermix').innerText = Math.round(phaserMixVal * 100) + '%';
+
+            const phaserSpeedVal = fx.phaserSpeed !== undefined ? fx.phaserSpeed : 1.0;
+            document.getElementById('knob-phaserspeed').value = phaserSpeedVal;
+            document.getElementById('val-phaserspeed').innerText = phaserSpeedVal.toFixed(1) + 'Hz';
+            document.getElementById('knob-fx-phaserspeed').value = phaserSpeedVal;
+            document.getElementById('val-fx-phaserspeed').innerText = phaserSpeedVal.toFixed(1) + 'Hz';
+
             // Sincroniza delay settings
             const delayMixVal = chan.synthSettings.delayMix !== undefined ? chan.synthSettings.delayMix : 0.0;
             document.getElementById('knob-delaymix').value = delayMixVal;
@@ -4472,12 +4721,74 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                     chan.synthSettings.delayMix = val;
                 } else if (fxType === 'delayFeedback') {
                     chan.synthSettings.delayFeedback = val;
+                } else if (fxType === 'eqLow' && channelEQLowNodes[chId]) {
+                    channelEQLowNodes[chId].gain.value = val;
+                } else if (fxType === 'eqMid' && channelEQMidNodes[chId]) {
+                    channelEQMidNodes[chId].gain.value = val;
+                } else if (fxType === 'eqHigh' && channelEQHighNodes[chId]) {
+                    channelEQHighNodes[chId].gain.value = val;
+                } else if (fxType === 'phaserMix' && channelPhaserGains[chId]) {
+                    channelPhaserGains[chId].dry.gain.value = 1.0 - val * 0.5;
+                    channelPhaserGains[chId].wet.gain.value = val * 0.5;
+                } else if (fxType === 'phaserSpeed' && channelPhaserLfos[chId]) {
+                    channelPhaserLfos[chId].frequency.value = val;
                 }
             }
 
             // Sincroniza controles visuais correspondentes
             const pctText = Math.round(val * 100) + '%';
             if (fxType === 'reverb') {
+                document.getElementById('knob-reverb').value = val;
+                document.getElementById('val-reverb').innerText = pctText;
+                document.getElementById('knob-fx-reverb').value = val;
+                document.getElementById('val-fx-reverb').innerText = pctText;
+            } else if (fxType === 'chorus') {
+                document.getElementById('knob-chorus').value = val;
+                document.getElementById('val-chorus').innerText = pctText;
+                document.getElementById('knob-fx-chorus').value = val;
+                document.getElementById('val-fx-chorus').innerText = pctText;
+            } else if (fxType === 'distortion') {
+                document.getElementById('knob-distortion').value = val;
+                document.getElementById('val-distortion').innerText = pctText;
+                document.getElementById('knob-fx-distortion').value = val;
+                document.getElementById('val-fx-distortion').innerText = pctText;
+            } else if (fxType === 'delay') {
+                document.getElementById('knob-delaymix').value = val;
+                document.getElementById('val-delaymix').innerText = pctText;
+                document.getElementById('knob-fx-delay').value = val;
+                document.getElementById('val-fx-delay').innerText = pctText;
+            } else if (fxType === 'delayFeedback') {
+                document.getElementById('knob-delayfeedback').value = val;
+                document.getElementById('val-delayfeedback').innerText = pctText;
+                document.getElementById('knob-fx-delay-feedback').value = val;
+                document.getElementById('val-fx-delay-feedback').innerText = pctText;
+            } else if (fxType === 'eqLow') {
+                document.getElementById('knob-eqlow').value = val;
+                document.getElementById('val-eqlow').innerText = val.toFixed(1) + 'dB';
+                document.getElementById('knob-fx-eqlow').value = val;
+                document.getElementById('val-fx-eqlow').innerText = val.toFixed(1) + 'dB';
+            } else if (fxType === 'eqMid') {
+                document.getElementById('knob-eqmid').value = val;
+                document.getElementById('val-eqmid').innerText = val.toFixed(1) + 'dB';
+                document.getElementById('knob-fx-eqmid').value = val;
+                document.getElementById('val-fx-eqmid').innerText = val.toFixed(1) + 'dB';
+            } else if (fxType === 'eqHigh') {
+                document.getElementById('knob-eqhigh').value = val;
+                document.getElementById('val-eqhigh').innerText = val.toFixed(1) + 'dB';
+                document.getElementById('knob-fx-eqhigh').value = val;
+                document.getElementById('val-fx-eqhigh').innerText = val.toFixed(1) + 'dB';
+            } else if (fxType === 'phaserMix') {
+                document.getElementById('knob-phasermix').value = val;
+                document.getElementById('val-phasermix').innerText = pctText;
+                document.getElementById('knob-fx-phasermix').value = val;
+                document.getElementById('val-fx-phasermix').innerText = pctText;
+            } else if (fxType === 'phaserSpeed') {
+                document.getElementById('knob-phaserspeed').value = val;
+                document.getElementById('val-phaserspeed').innerText = val.toFixed(1) + 'Hz';
+                document.getElementById('knob-fx-phaserspeed').value = val;
+                document.getElementById('val-fx-phaserspeed').innerText = val.toFixed(1) + 'Hz';
+            }
+            if (false) { // Skip original conditions
                 document.getElementById('knob-reverb').value = val;
                 document.getElementById('val-reverb').innerText = pctText;
                 document.getElementById('knob-fx-reverb').value = val;
@@ -4871,6 +5182,75 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
         let redoStack = [];
 
         function pushHistory() {
+            const snapshot = {
+                steps: {},
+                sequencerSteps: sequencerSteps
+            };
+            Object.keys(channels).forEach(chId => {
+                snapshot.steps[chId] = [...channels[chId].steps];
+            });
+            undoStack.push(snapshot);
+            if (undoStack.length > 50) {
+                undoStack.shift();
+            }
+            redoStack = []; // limpa redo ao fazer novas ações
+        }
+
+        function undoAction() {
+            if (undoStack.length === 0) {
+                showToast("Nada para desfazer");
+                return;
+            }
+            const currentSnapshot = {
+                steps: {},
+                sequencerSteps: sequencerSteps
+            };
+            Object.keys(channels).forEach(chId => {
+                currentSnapshot.steps[chId] = [...channels[chId].steps];
+            });
+            redoStack.push(currentSnapshot);
+
+            const prev = undoStack.pop();
+            sequencerSteps = prev.sequencerSteps;
+            document.getElementById('display-total-steps').innerText = sequencerSteps;
+            
+            Object.keys(prev.steps).forEach(chId => {
+                if (channels[chId]) {
+                    channels[chId].steps = prev.steps[chId];
+                }
+            });
+            renderSequencerRows();
+            showToast("Desfeito");
+        }
+
+        function redoAction() {
+            if (redoStack.length === 0) {
+                showToast("Nada para refazer");
+                return;
+            }
+            const currentSnapshot = {
+                steps: {},
+                sequencerSteps: sequencerSteps
+            };
+            Object.keys(channels).forEach(chId => {
+                currentSnapshot.steps[chId] = [...channels[chId].steps];
+            });
+            undoStack.push(currentSnapshot);
+
+            const next = redoStack.pop();
+            sequencerSteps = next.sequencerSteps;
+            document.getElementById('display-total-steps').innerText = sequencerSteps;
+
+            Object.keys(next.steps).forEach(chId => {
+                if (channels[chId]) {
+                    channels[chId].steps = next.steps[chId];
+                }
+            });
+            renderSequencerRows();
+            showToast("Refeito");
+        }
+
+        function pushHistoryOriginal() {
             const snapshot = {};
             Object.keys(channels).forEach(chId => {
                 snapshot[chId] = [...channels[chId].steps];
@@ -5353,6 +5733,35 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
             const code = generateCodeFromSequencer();
             playCodeDirectly(code);
         };
+
+        function randomizeChannels() {
+            pushHistory();
+            Object.keys(channels).forEach(chId => {
+                const chan = channels[chId];
+                const len = chan.steps.length;
+                const isKick = chId.toLowerCase().includes('kick');
+                const isHihat = chId.toLowerCase().includes('hihat') || chId.toLowerCase().includes('hat');
+                const isSnare = chId.toLowerCase().includes('snare');
+
+                for (let i = 0; i < len; i++) {
+                    if (isKick) {
+                        // Kicks on beats 0, 4, 8, 12...
+                        chan.steps[i] = (i % 4 === 0) ? true : (Math.random() < 0.1);
+                    } else if (isHihat) {
+                        // Hihats offbeat
+                        chan.steps[i] = (i % 2 === 1) ? (Math.random() < 0.8) : (Math.random() < 0.2);
+                    } else if (isSnare) {
+                        // Snare on 4, 12...
+                        chan.steps[i] = (i % 8 === 4) ? true : (Math.random() < 0.05);
+                    } else {
+                        // Melodic / Bass channels
+                        chan.steps[i] = (Math.random() < 0.15) ? 'C4' : false;
+                    }
+                }
+            });
+            renderSequencerRows();
+            showToast("Sequencer Randomizado!");
+        }
 
         // --- TRANSPORT PLAY / STOP CONTROLS ---
         async function playCode() {
@@ -7228,6 +7637,28 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
         }
 
         // Sincronização dos sliders FX (Plugin Panel e FX Rack Mixer)
+        ['knob-eqlow', 'knob-fx-eqlow'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', (e) => updateFXValue('eqLow', parseFloat(e.target.value)));
+        });
+        ['knob-eqmid', 'knob-fx-eqmid'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', (e) => updateFXValue('eqMid', parseFloat(e.target.value)));
+        });
+        ['knob-eqhigh', 'knob-fx-eqhigh'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', (e) => updateFXValue('eqHigh', parseFloat(e.target.value)));
+        });
+        ['knob-phasermix', 'knob-fx-phasermix'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', (e) => updateFXValue('phaserMix', parseFloat(e.target.value)));
+        });
+        ['knob-phaserspeed', 'knob-fx-phaserspeed'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', (e) => updateFXValue('phaserSpeed', parseFloat(e.target.value)));
+        });
+
+        // Sincronização dos sliders FX (Plugin Panel e FX Rack Mixer)
         ['knob-reverb', 'knob-fx-reverb'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.addEventListener('input', (e) => updateFXValue('reverb', parseFloat(e.target.value)));
@@ -7541,6 +7972,39 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                     '--glow-green': '#777777',
                     '--glow-magenta': '#555555',
                     '--glow-yellow': '#888888'
+                },
+                matrix: {
+                    '--bg-dark': '#000400',
+                    '--panel-bg': 'rgba(0, 15, 0, 0.85)',
+                    '--panel-header': 'rgba(0, 25, 0, 0.95)',
+                    '--border-daw': 'rgba(0, 255, 0, 0.18)',
+                    '--glow-orange': '#00ff00',
+                    '--glow-cyan': '#00ff66',
+                    '--glow-green': '#39e75f',
+                    '--glow-magenta': '#00ff00',
+                    '--glow-yellow': '#a3ff05'
+                },
+                ice: {
+                    '--bg-dark': '#020813',
+                    '--panel-bg': 'rgba(10, 24, 45, 0.75)',
+                    '--panel-header': 'rgba(16, 37, 66, 0.9)',
+                    '--border-daw': 'rgba(0, 229, 255, 0.15)',
+                    '--glow-orange': '#00e5ff',
+                    '--glow-cyan': '#00aaff',
+                    '--glow-green': '#00ffd5',
+                    '--glow-magenta': '#7b2cbf',
+                    '--glow-yellow': '#00f0ff'
+                },
+                red: {
+                    '--bg-dark': '#050000',
+                    '--panel-bg': 'rgba(26, 0, 0, 0.85)',
+                    '--panel-header': 'rgba(45, 0, 0, 0.95)',
+                    '--border-daw': 'rgba(255, 0, 0, 0.22)',
+                    '--glow-orange': '#ff0000',
+                    '--glow-cyan': '#ff3333',
+                    '--glow-green': '#ff5555',
+                    '--glow-magenta': '#d90429',
+                    '--glow-yellow': '#ef233c'
                 }
             };
 
@@ -8257,7 +8721,72 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
         // Inicialização
         window.addEventListener('DOMContentLoaded', async () => {
             // Seletor de Temas
-            const themeSelect = document.getElementById('theme-select');
+            // Configuração do Painel de Ajuda Lateral
+        const btnToggleHelp = document.getElementById('btn-toggle-help');
+        const btnOpenHelp = document.getElementById('btn-open-help');
+        const helpPanel = document.getElementById('editor-help-panel');
+        
+        if (btnToggleHelp && btnOpenHelp && helpPanel) {
+            btnToggleHelp.addEventListener('click', () => {
+                helpPanel.classList.add('collapsed');
+                btnOpenHelp.style.display = 'block';
+            });
+            btnOpenHelp.addEventListener('click', () => {
+                helpPanel.classList.remove('collapsed');
+                btnOpenHelp.style.display = 'none';
+            });
+        }
+        
+        // Accordion functionality inside help panel
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+        accordionHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                const arrow = header.querySelector('span:last-child');
+                if (content.style.display === 'none' || content.style.display === '') {
+                    content.style.display = 'flex';
+                    arrow.innerText = '▲';
+                } else {
+                    content.style.display = 'none';
+                    arrow.innerText = '▼';
+                }
+            });
+        });
+        
+        // Snippet buttons click
+        const snippetButtons = document.querySelectorAll('.btn-snippet');
+        snippetButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.getAttribute('data-code');
+                if (codeMirrorInstance) {
+                    codeMirrorInstance.setValue(code.split('\n').join('\n'));
+                    showToast('Snippet carregado no editor!');
+                }
+            });
+        });
+
+        // Event listeners para os botões de Undo/Redo e Randomize
+        const btnRackUndo = document.getElementById('btn-undo');
+        if (btnRackUndo) btnRackUndo.addEventListener('click', undoAction);
+
+        const btnRackRedo = document.getElementById('btn-redo');
+        if (btnRackRedo) btnRackRedo.addEventListener('click', redoAction);
+
+        const btnRandomize = document.getElementById('btn-randomize-rack');
+        if (btnRandomize) btnRandomize.addEventListener('click', randomizeChannels);
+
+        // Teclas de atalho para Undo/Redo
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                undoAction();
+            } else if (e.ctrlKey && e.key.toLowerCase() === 'y') {
+                e.preventDefault();
+                redoAction();
+            }
+        });
+
+        const themeSelect = document.getElementById('theme-select');
             if (themeSelect) {
                 themeSelect.addEventListener('change', (e) => {
                     changeTheme(e.target.value);
