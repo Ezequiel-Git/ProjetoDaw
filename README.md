@@ -27,6 +27,41 @@ Com uma interface responsiva cyberpunk e múltiplos esquemas visuais premium, o 
 
 ---
 
+## 🐍 Nova Sintaxe PyDAW (Estilo Python)
+
+O Project Daw agora conta com um transpilador integrado que permite codificar música ao vivo usando uma sintaxe limpa inspirada em **Python** (PyDAW). Ela elimina a verbosidade tradicional do JavaScript (como `const`, `let` e ponto e vírgula `;`) e adota uma estrutura de script simples, legível e livre de restrições de direitos autorais.
+
+### Exemplo de Código PyDAW
+
+```python
+# Definindo o andamento da música
+bpm = 130
+
+# Criando e configurando o sintetizador de Kick
+kick = Synth("kick")
+kick.oscillator = "kick"
+kick.setEnvelope(0.00, 0.15, 0.00, 0.10)
+kick.setFilter(120, 1.0)
+kick.play("x .*3 x .*3")
+
+# Criando e configurando o sintetizador de Snare
+snare = Synth("snare")
+snare.type = "snare"
+snare.play(".*4 x .*7")
+
+# Exibindo log no console cyberpunk da DAW
+print("PyDAW Engine carregada com sucesso!")
+```
+
+### Principais Características:
+- **Comentários de Linha Única:** Use `#` no início das linhas ou ao final de instruções.
+- **Sem Semicolons:** Não é necessário usar `;` para terminar as linhas.
+- **Declaração Limpa de Variáveis:** Crie e declare sintetizadores diretamente (`synth = Synth("id")`), o motor da DAW adiciona a declaração em escopo restrito automaticamente.
+- **Propriedades Simplificadas:** Configure o oscilador/timbre usando as propriedades intuitivas `instrumento.oscillator = "timbre"` ou `instrumento.type = "timbre"`.
+- **Função Print:** O comando clássico `print("mensagem")` direciona mensagens em tempo real para o painel de logs/diagnósticos no console da DAW.
+
+---
+
 ## 🎹 Atalhos de Teclado (Shortcuts)
 
 Para agilizar o fluxo de produção, você pode usar os seguintes atalhos no teclado:
