@@ -8759,7 +8759,7 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
             btn.addEventListener('click', () => {
                 const code = btn.getAttribute('data-code');
                 if (window.dawCodeEditor) {
-                    window.dawCodeEditor.setValue(code.split('\n').join('\n'));
+                    window.dawCodeEditor.setValue(code.split('\\n').join('\n'));
                     showToast('Snippet carregado no editor!');
                 }
             });
