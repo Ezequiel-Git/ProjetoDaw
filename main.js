@@ -2956,7 +2956,7 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 }
             });
 
-            let newCode = `# FRUITY CYBER DAW LIVE CODE - PyDAW MODE\r\nbpm = ${newBpm}\r\n\r\n`;
+            let newCode = `# FRUITY CYBER DAW LIVE CODE\r\nbpm = ${newBpm}\r\n\r\n`;
             const chIds = new Set([...Object.keys(synths), ...Object.keys(patterns)]);
             
             chIds.forEach(chId => {
@@ -5511,6 +5511,9 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
             if (!isAudioPlaying) return;
             animationFrameId = requestAnimationFrame(drawRealTimeVisualizer);
 
+            // ATUALIZAÇÃO DO CLOCK E TIME DISPLAYS
+            updateClockAndPlayhead();
+
             // CPU/GPU Optimization: Skip drawing if tab is inactive or browser is minimized
             if (document.hidden || window.activeWorkspaceTab !== 'wtab-mixer') return;
 
@@ -5851,9 +5854,6 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 
                 updateVUMeter(chId + '-vu', isAudioPlaying ? finalVU : 0);
             });
-
-            // ATUALIZAÇÃO DO CLOCK E TIME DISPLAYS
-            updateClockAndPlayhead();
         }
 
         function updateClockAndPlayhead() {
