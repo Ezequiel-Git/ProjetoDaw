@@ -2990,9 +2990,13 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
         function transpilePyDawToJs(pyCode) {
             let jsCode = pyCode;
             
+            // Normalize line endings to prevent carriage return syntax issues
+            jsCode = jsCode.replace(/\r\n/g, '\n');
+
             // 1. Replace python-style comments: "# comment" -> "// comment"
-            jsCode = jsCode.replace(/^[ \t]*#[ \t]*(.*)/gm, '// $1');
-            jsCode = jsCode.replace(/(\s+)#[ \t]*(.*)/g, '$1// $2');
+            // To avoid matching G#3, only match # if it is at start of line or preceded by whitespace
+            jsCode = jsCode.replace(/^[ \t]*#[ 	]*(.*)/gm, '// $1');
+            jsCode = jsCode.replace(/([ \t]+)#[ 	]*(.*)/g, '$1// $2');
 
             // 2. Translate print(...) -> logMessage(...)
             jsCode = jsCode.replace(/\bprint\((.*?)\)/g, 'logMessage($1)');
@@ -3007,6 +3011,10 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
 
             // 5. Translate BPM assignment: "bpm = 130" -> "bpm(130)"
             jsCode = jsCode.replace(/\bbpm\s*=\s*(\d+)/g, 'bpm($1)');
+
+            // 6. Translate True/False to true/false (Python boolean compatibility)
+            jsCode = jsCode.replace(/\bTrue\b/g, 'true');
+            jsCode = jsCode.replace(/\bFalse\b/g, 'false');
 
             return jsCode;
         }
