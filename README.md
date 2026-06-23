@@ -27,11 +27,11 @@ Com uma interface responsiva cyberpunk e múltiplos esquemas visuais premium, o 
 
 ---
 
-## 🐍 Nova Sintaxe PyDAW (Estilo Python)
+## ⚡ Sintaxe de Código Customizada
 
-O Project Daw agora conta com um transpilador integrado que permite codificar música ao vivo usando uma sintaxe limpa inspirada em **Python** (PyDAW). Ela elimina a verbosidade tradicional do JavaScript (como `const`, `let` e ponto e vírgula `;`) e adota uma estrutura de script simples, legível e livre de restrições de direitos autorais.
+O Project Daw agora conta com um transpilador integrado que permite codificar música ao vivo usando uma sintaxe de script limpa e simplificada. Ela elimina a verbosidade tradicional do JavaScript (como `const`, `let` e ponto e vírgula `;`) e adota uma estrutura de script limpa e legível.
 
-### Exemplo de Código PyDAW
+### Exemplo de Código
 
 ```python
 # Definindo o andamento da música
@@ -50,7 +50,7 @@ snare.type = "snare"
 snare.play(".*4 x .*7")
 
 # Exibindo log no console cyberpunk da DAW
-print("PyDAW Engine carregada com sucesso!")
+print("CyberDAW Engine carregada com sucesso!")
 ```
 
 ### Principais Características:

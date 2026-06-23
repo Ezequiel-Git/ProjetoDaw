@@ -457,7 +457,7 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
 
         function generateOldCodeFromSequencer() {
             const bpmVal = document.getElementById('display-bpm').value || document.getElementById('bpm-slider').value;
-            let code = `# FRUITY CYBER DAW SEQUENCE - PyDAW MODE\r\nbpm = ${bpmVal}\r\n\r\n`;
+            let code = `# FRUITY CYBER DAW SEQUENCE - EDITOR MODE\r\nbpm = ${bpmVal}\r\n\r\n`;
             
             Object.keys(channels).forEach(chId => {
                 const chan = channels[chId];
@@ -2979,14 +2979,14 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 newCode += `${chId}.play("${pattern}")\r\n\r\n`;
             });
 
-            newCode += `print("PyDAW Engine Initialized successfully!")`;
+            newCode += `print("CyberDAW Engine Initialized successfully!")`;
             return newCode.trim();
         }
 
         // --- INTERPRETADOR E AVALIADOR DE CÓDIGO DAW ---
 
 
-        function transpilePyDawToJs(pyCode) {
+        function transpileCodeToJs(pyCode) {
             let jsCode = pyCode;
             
             // Normalize line endings to prevent carriage return syntax issues
@@ -3022,7 +3022,7 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
 
         function parseDAWCode(codeStr, skipEditorUpdate = false) {
             if (codeStr && (codeStr.includes('#') || codeStr.includes('print(') || codeStr.includes('.oscillator =') || codeStr.includes('.type =') || codeStr.includes('bpm ='))) {
-                codeStr = transpilePyDawToJs(codeStr);
+                codeStr = transpileCodeToJs(codeStr);
             }
             // Se o formato for antigo, realiza a migração imediata
             if (isOldCodeFormat(codeStr)) {
