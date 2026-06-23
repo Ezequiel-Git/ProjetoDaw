@@ -2957,7 +2957,7 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 }
             });
 
-            let newCode = `// FRUITY CYBER DAW LIVE CODE - RE-CODED\nbpm(${newBpm});\n\n`;
+            let newCode = `// FRUITY CYBER DAW LIVE CODE - C++ MODE\r\n#include <cyberdaw>\r\nusing namespace CyberDAW;\r\n\r\nint main() {\r\n    Engine::setBPM(${newBpm});\r\n\r\n`;
             const chIds = new Set([...Object.keys(synths), ...Object.keys(patterns)]);
             
             chIds.forEach(chId => {
@@ -2965,25 +2965,54 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 const fx = fxs[chId] || { distortion: 0, chorus: 0, reverb: 0 };
                 const pattern = patterns[chId] || ".";
 
-                newCode += `const ${chId} = new Synth("${chId}");\n`;
-                newCode += `${chId}.setOscillator("${synth.oscType || 'sine'}");\n`;
-                newCode += `${chId}.setEnvelope(${synth.attack || 0.02}, ${synth.decay || 0.25}, ${synth.sustain || 0.5}, ${synth.release || 0.2});\n`;
-                newCode += `${chId}.setFilter(${synth.cutoff || 1200}, ${(synth.resonance || 1.0).toFixed(1)});\n`;
-                newCode += `${chId}.setDelay(${synth.delayMix || 0.0}, ${synth.delayTime || 0.25});\n`;
-                if (synth.pitch) newCode += `${chId}.setPitch(${synth.pitch});\n`;
-                if (synth.humanizer) newCode += `${chId}.setHumanize(${synth.humanizer});\n`;
-                if (synth.sustainPedal) newCode += `${chId}.setSustainPedal(true);\n`;
+                newCode += `    Synth* ${chId} = new Synth("${chId}");\r\n`;
+                newCode += `    ${chId}->setOscillator("${synth.oscType || 'sine'}");\r\n`;
+                newCode += `    ${chId}->setEnvelope(${synth.attack || 0.02}, ${synth.decay || 0.25}, ${synth.sustain || 0.5}, ${synth.release || 0.2});\r\n`;
+                newCode += `    ${chId}->setFilter(${synth.cutoff || 1200}, ${(synth.resonance || 1.0).toFixed(1)});\r\n`;
+                newCode += `    ${chId}->setDelay(${synth.delayMix || 0.0}, ${synth.delayTime || 0.25});\r\n`;
+                if (synth.pitch) newCode += `    ${chId}->setPitch(${synth.pitch});\r\n`;
+                if (synth.humanizer) newCode += `    ${chId}->setHumanize(${synth.humanizer});\r\n`;
+                if (synth.sustainPedal) newCode += `    ${chId}->setSustainPedal(true);\r\n`;
                 if (fx.distortion > 0 || fx.chorus > 0 || fx.reverb > 0) {
-                    newCode += `${chId}.setFx(${fx.distortion}, ${fx.chorus}, ${fx.reverb});\n`;
+                    newCode += `    ${chId}->setFx(${fx.distortion}, ${fx.chorus}, ${fx.reverb});\r\n`;
                 }
-                newCode += `${chId}.play("${pattern}");\n\n`;
+                newCode += `    ${chId}->play("${pattern}");\r\n\r\n`;
             });
 
+            newCode += `    std::cout << "CyberDAW C++ Engine Initialized Successfully!" << std::endl;\r\n    return 0;\r\n}`;
             return newCode.trim();
         }
 
         // --- INTERPRETADOR E AVALIADOR DE CÓDIGO DAW ---
+
+        function transpileCppToJs(cppCode) {
+            let jsCode = cppCode;
+            jsCode = jsCode.replace(/#include\s*[<"].+?[>"]/g, '// $&');
+            jsCode = jsCode.replace(/using\s+namespace\s+\w+;/g, '// $&');
+            jsCode = jsCode.replace(/(?:Synth|Track|Volume|Delay)\s*\*\s*(\w+)\s*=\s*new\s+(Synth|Track)\s*\((.+?)\);/g, 'let $1 = new $2($3);');
+            jsCode = jsCode.replace(/(?:Synth|Track)\s+(\w+)\s*\((.+?)\);/g, 'let $1 = new Synth($2);');
+            jsCode = jsCode.replace(/\b(?:float|double|char|auto)\s+(\w+)\s*=/g, 'let $1 =');
+            jsCode = jsCode.replace(/\bint\s+(?!main\b)(\w+)\s*=/g, 'let $1 =');
+            let hasMain = false;
+            if (/\bint\s+main\s*\(/.test(jsCode)) {
+                jsCode = jsCode.replace(/\bint\s+main\s*\(/g, 'function main(');
+                hasMain = true;
+            }
+            jsCode = jsCode.replace(/(\w+)->/g, '$1.');
+            jsCode = jsCode.replace(/(?:std::)?cout\s*<<\s*(.+?)\s*<<\s*(?:std::)?endl\s*;/g, 'logMessage($1);');
+            jsCode = jsCode.replace(/(?:std::)?cout\s*<<\s*(.+?)\s*;/g, 'logMessage($1);');
+            jsCode = jsCode.replace(/Engine::setBPM\s*\(\s*(.+?)\s*\)\s*;/g, 'bpm($1);');
+            if (hasMain) {
+                jsCode += "\n\nif (typeof main === 'function') { main(); }";
+            }
+            return jsCode;
+        }
+
+
         function parseDAWCode(codeStr, skipEditorUpdate = false) {
+            if (codeStr && (codeStr.includes('#include') || codeStr.includes('int main(') || codeStr.includes('using namespace') || codeStr.includes('->') || codeStr.includes('std::cout'))) {
+                codeStr = transpileCppToJs(codeStr);
+            }
             // Se o formato for antigo, realiza a migração imediata
             if (isOldCodeFormat(codeStr)) {
                 const migrated = migrateOldCodeToNewCode(codeStr);
