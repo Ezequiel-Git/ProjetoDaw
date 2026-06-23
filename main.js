@@ -8758,8 +8758,8 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
         snippetButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const code = btn.getAttribute('data-code');
-                if (codeMirrorInstance) {
-                    codeMirrorInstance.setValue(code.split('\n').join('\n'));
+                if (window.dawCodeEditor) {
+                    window.dawCodeEditor.setValue(code.split('\n').join('\n'));
                     showToast('Snippet carregado no editor!');
                 }
             });
