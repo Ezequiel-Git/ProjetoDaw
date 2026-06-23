@@ -7460,68 +7460,14 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
 
         // Sistema de abas para o editor de código: Nova JS vs Antiga Declarativa
         function setEditorTabMode(mode) {
-            const btnNew = document.getElementById('btn-editor-new');
-            const btnOld = document.getElementById('btn-editor-old');
-            if (!btnNew || !btnOld) return;
-
-            if (mode === 'new') {
-                btnNew.style.border = '1px solid var(--glow-green)';
-                btnNew.style.background = 'rgba(0, 230, 118, 0.1)';
-                btnNew.style.color = 'var(--glow-green)';
-                btnNew.classList.add('active');
-
-                btnOld.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-                btnOld.style.background = 'rgba(255, 255, 255, 0.02)';
-                btnOld.style.color = 'var(--text-secondary)';
-                btnOld.classList.remove('active');
-
-                editorMode = 'new';
-            } else {
-                btnOld.style.border = '1px solid var(--glow-green)';
-                btnOld.style.background = 'rgba(0, 230, 118, 0.1)';
-                btnOld.style.color = 'var(--glow-green)';
-                btnOld.classList.add('active');
-
-                btnNew.style.border = '1px solid rgba(255, 255, 255, 0.1)';
-                btnNew.style.background = 'rgba(255, 255, 255, 0.02)';
-                btnNew.style.color = 'var(--text-secondary)';
-                btnNew.classList.remove('active');
-
-                editorMode = 'old';
-            }
+            editorMode = 'new';
         }
 
         function switchEditorMode(mode) {
-            if (editorMode === mode) return;
-            const editor = document.getElementById('code-editor');
-            if (!editor) return;
-
-            const currentCode = editor.value;
-
-            if (mode === 'new') {
-                const newCode = migrateOldCodeToNewCode(currentCode);
-                editor.value = newCode;
-                setEditorTabMode('new');
-                showToast("Modo de Edição: Sintaxe JS (Nova)");
-                
-                activeParsedCode = parseDAWCode(newCode);
-                renderDAW();
-                updateStepGridHighlights();
-            } else {
-                activeParsedCode = parseDAWCode(currentCode);
-                const oldCode = generateOldCodeFromSequencer();
-                editor.value = oldCode;
-                setEditorTabMode('old');
-                showToast("Modo de Edição: Sintaxe Sequenciador (Antiga)");
-                
-                activeParsedCode = parseDAWCode(oldCode, true);
-                renderDAW();
-                updateStepGridHighlights();
-            }
+            editorMode = 'new';
         }
-
-        document.getElementById('btn-editor-new').onclick = () => switchEditorMode('new');
-        document.getElementById('btn-editor-old').onclick = () => switchEditorMode('old');
+        
+        // Removed btn-editor onclick listeners (old syntax buttons removed from DOM)
 
         // Sistema de Salvamento Automático (Auto-Save)
         let lastSavedCode = '';
