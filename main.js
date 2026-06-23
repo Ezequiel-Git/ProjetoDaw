@@ -456,14 +456,15 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
         }
 
         function generateOldCodeFromSequencer() {
-            const bpmVal = document.getElementById('bpm-slider').value;
-            let code = `// FRUITY CYBER DAW SEQUENCE - OLD FORMAT\nbpm(${bpmVal});\n\n`;
+            const bpmVal = document.getElementById('display-bpm').value || document.getElementById('bpm-slider').value;
+            let code = `# FRUITY CYBER DAW SEQUENCE - PyDAW MODE\r\nbpm = ${bpmVal}\r\n\r\n`;
             
-            // 1. defineSynth calls
             Object.keys(channels).forEach(chId => {
                 const chan = channels[chId];
                 const s = chan.synthSettings || {};
-                const oscType = chan.type;
+                const fx = chan.fxSettings || { distortion: 0, chorus: 0, reverb: 0 };
+                const oscType = chan.type || 'sine';
+                
                 const attack = s.attack !== undefined ? s.attack : 0.02;
                 const decay = s.decay !== undefined ? s.decay : 0.25;
                 const sustain = s.sustain !== undefined ? s.sustain : 0.5;
@@ -476,24 +477,21 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 const pitch = s.pitch !== undefined ? s.pitch : 0;
                 const humanizer = s.humanizer !== undefined ? s.humanizer : 0;
                 const sustainPedal = !!s.sustainPedal;
+
+                code += `# Setup ${chId}\r\n`;
+                code += `${chId} = Synth("${chId}")\r\n`;
+                code += `${chId}.oscillator = "${oscType}"\r\n`;
+                code += `${chId}.setEnvelope(${attack.toFixed(2)}, ${decay.toFixed(2)}, ${sustain.toFixed(2)}, ${release.toFixed(2)})\r\n`;
+                code += `${chId}.setFilter(${cutoff}, ${resonance.toFixed(1)})\r\n`;
+                code += `${chId}.setDelay(${delayMix.toFixed(2)}, ${delayTime.toFixed(2)}, ${delayFeedback.toFixed(2)})\r\n`;
                 
-                code += `defineSynth("${chId}", "${oscType}", ${attack.toFixed(2)}, ${decay.toFixed(2)}, ${sustain.toFixed(2)}, ${release.toFixed(2)}, ${cutoff}, ${resonance.toFixed(1)}, ${delayMix.toFixed(2)}, ${delayTime.toFixed(2)}, ${pitch}, ${humanizer.toFixed(2)}, ${sustainPedal ? 'true' : 'false'}, ${delayFeedback.toFixed(2)});\n`;
-            });
-            
-            // 2. fx calls
-            Object.keys(channels).forEach(chId => {
-                const chan = channels[chId];
-                const fx = chan.fxSettings || { distortion: 0, chorus: 0, reverb: 0 };
+                if (pitch) code += `${chId}.setPitch(${pitch})\r\n`;
+                if (humanizer) code += `${chId}.setHumanize(${humanizer.toFixed(2)})\r\n`;
+                if (sustainPedal) code += `${chId}.setSustainPedal(True)\r\n`;
                 if (fx.distortion > 0 || fx.chorus > 0 || fx.reverb > 0) {
-                    code += `fx("${chId}", ${fx.distortion.toFixed(2)}, ${fx.chorus.toFixed(2)}, ${fx.reverb.toFixed(2)});\n`;
+                    code += `${chId}.setFx(${fx.distortion.toFixed(2)}, ${fx.chorus.toFixed(2)}, ${fx.reverb.toFixed(2)})\r\n`;
                 }
-            });
-            
-            code += `\n`;
-            
-            // 3. channel steps
-            Object.keys(channels).forEach(chId => {
-                const chan = channels[chId];
+
                 const isDrum = isDrumType(chan.type);
                 const stepsStr = chan.steps.map(step => {
                     if (step === '_') {
@@ -504,7 +502,8 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                         return '.';
                     }
                 }).join(' ');
-                code += `${chId}("${stepsStr}");\n`;
+
+                code += `${chId}.play("${stepsStr}")\r\n\r\n`;
             });
             
             return code.trim();
@@ -534,19 +533,19 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
                 }
             }).join(' ');
 
-            let code = `const ${chId} = new Synth("${chId}");\n`;
-            code += `${chId}.setOscillator("${chan.type}");\n`;
-            code += `${chId}.setEnvelope(${s.attack.toFixed(2)}, ${s.decay.toFixed(2)}, ${s.sustain.toFixed(2)}, ${s.release.toFixed(2)});\n`;
-            code += `${chId}.setFilter(${s.cutoff}, ${s.resonance.toFixed(1)});\n`;
+            let code = `${chId} = Synth("${chId}")\r\n`;
+            code += `${chId}.oscillator = "${chan.type}"\r\n`;
+            code += `${chId}.setEnvelope(${s.attack.toFixed(2)}, ${s.decay.toFixed(2)}, ${s.sustain.toFixed(2)}, ${s.release.toFixed(2)})\r\n`;
+            code += `${chId}.setFilter(${s.cutoff}, ${s.resonance.toFixed(1)})\r\n`;
             const delayFb = s.delayFeedback !== undefined ? s.delayFeedback : 0.5;
-            code += `${chId}.setDelay(${s.delayMix.toFixed(2)}, ${s.delayTime.toFixed(2)}, ${delayFb.toFixed(2)});\n`;
-            if (p) code += `${chId}.setPitch(${p});\n`;
-            if (h) code += `${chId}.setHumanize(${h.toFixed(2)});\n`;
-            if (sp) code += `${chId}.setSustainPedal(true);\n`;
+            code += `${chId}.setDelay(${s.delayMix.toFixed(2)}, ${s.delayTime.toFixed(2)}, ${delayFb.toFixed(2)})\r\n`;
+            if (p) code += `${chId}.setPitch(${p})\r\n`;
+            if (h) code += `${chId}.setHumanize(${h.toFixed(2)})\r\n`;
+            if (sp) code += `${chId}.setSustainPedal(True)\r\n`;
             if (fx.distortion > 0 || fx.chorus > 0 || fx.reverb > 0) {
-                code += `${chId}.setFx(${fx.distortion.toFixed(2)}, ${fx.chorus.toFixed(2)}, ${fx.reverb.toFixed(2)});\n`;
+                code += `${chId}.setFx(${fx.distortion.toFixed(2)}, ${fx.chorus.toFixed(2)}, ${fx.reverb.toFixed(2)})\r\n`;
             }
-            code += `${chId}.play("${stepsStr}");`;
+            code += `${chId}.play("${stepsStr}")`;
             
             return code;
         }
@@ -8608,7 +8607,7 @@ import { isDrumType, scheduleNodeCleanup, triggerMetronomeClick, noteToFreq, not
             try {
                 const savedSongs = JSON.parse(localStorage.getItem('strudel_songs') || '[]');
                 const defaultSong = savedSongs.find(s => s.name === "Cybernetic Neon Drift");
-                const isCorrupted = !defaultSong || defaultSong.code.length < 300 || (!defaultSong.code.includes('defineSynth') && !defaultSong.code.includes('loadInstrument'));
+                const isCorrupted = !defaultSong || defaultSong.code.length < 300 || (!defaultSong.code.includes('defineSynth') && !defaultSong.code.includes('loadInstrument') && !defaultSong.code.includes('Synth'));
                 
                 if (isCorrupted) {
                     const response = await fetch(PRESETS_URL);
