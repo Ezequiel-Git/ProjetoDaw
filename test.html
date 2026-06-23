@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAW Automated Test Suite</title>
+    <style>
+        :root {
+            --bg-dark: #0a0a12;
+            --border-glow: #00ffcc;
+            --text-main: #f0f0ff;
+            --success: #39ff14;
+            --failure: #ff0055;
+            --info: #00bfff;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            border-bottom: 2px solid var(--border-glow);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 8px var(--border-glow);
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 120px);
+        }
+        .panel {
+            flex: 1;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            padding: 15px;
+            background: #11111b;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel h2 {
+            margin-top: 0;
+            color: var(--info);
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 5px;
+        }
+        #iframe-container {
+            flex: 1.5;
+            position: relative;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
+            border-radius: 8px;
+        }
+        #test-results {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .test-case {
+            padding: 10px;
+            border-bottom: 1px solid #1f2937;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            background: #181824;
+        }
+        .test-case.pending {
+            border-left: 4px solid var(--info);
+        }
+        .test-case.pass {
+            border-left: 4px solid var(--success);
+        }
+        .test-case.fail {
+            border-left: 4px solid var(--failure);
+        }
+        .test-title {
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+        .test-status {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        .pass .test-status { color: var(--success); }
+        .fail .test-status { color: var(--failure); }
+        .pending .test-status { color: var(--info); }
+        .test-log {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-top: 5px;
+            white-space: pre-wrap;
+        }
+        #terminal-output {
+            background: #050508;
+            border: 1px solid #111827;
+            font-family: monospace;
+            padding: 10px;
+            border-radius: 4px;
+            height: 150px;
+            overflow-y: auto;
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🧪 Suite de Testes Automatizados - Cyberpunk DAW</h1>
+    </header>
+    <div class="container">
+        <div class="panel" id="iframe-container">
+            <h2>Live App Preview</h2>
+            <iframe id="daw-frame" src="index.html"></iframe>
+        </div>
+        <div class="panel">
+            <h2>Resultados do Teste</h2>
+            <ul id="test-results">
+                <!-- Dynamic Test Cases -->
+            </ul>
+            <h2>Console do Runner</h2>
+            <div id="terminal-output">> Aguardando inicialização do DAW iframe...</div>
+        </div>
+    </div>
+
+    <script>
+        const dawFrame = document.getElementById('daw-frame');
+        const terminal = document.getElementById('terminal-output');
+        const resultsList = document.getElementById('test-results');
+
+        function log(msg, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            terminal.innerHTML += `\n[${time}] ${msg}`;
+            terminal.scrollTop = terminal.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${msg}`);
+        }
+
+        const tests = [
+            {
+                name: 'CodeMirror 5 Editor & Autocomplete Test',
+                run: async (win) => {
+                    log('Verificando inicialização do CodeMirror...');
+                    if (!win.dawCodeEditor) {
+                        throw new Error('window.dawCodeEditor não foi inicializado no escopo global.');
+                    }
+                    log('CodeMirror detectado com sucesso.');
+
+                    // Testar autocomplete
+                    log('Testando helper de autocomplete do CodeMirror...');
+                    const helper = win.CodeMirror.helpers.hint.javascript;
+                    if (!helper) {
+                        throw new Error('Helper de autocompletar do CodeMirror não foi registrado.');
+                    }
+
+                    // Mock do editor e cursor para simular autocomplete
+                    const mockEditor = {
+                        getCursor: () => ({ line: 0, ch: 3 }),
+                        getTokenAt: () => ({ string: 'bp', start: 0, end: 2 })
+                    };
+                    const hintResult = helper(mockEditor);
+                    log(`Resultado do autocomplete para prefixo 'bp': ${JSON.stringify(hintResult.list)}`);
+                    
+                    if (!hintResult.list.includes('bpm')) {
+                        throw new Error('Autocomplete falhou ao sugerir "bpm" para o prefixo "bp".');
+                    }
+                    
+                    log('Autocomplete verificado com sucesso.');
+                }
+            },
+            {
+                name: 'Web Audio Ping-Pong Delay & Cross-Feedback Routing Test',
+                run: async (win) => {
+                    log('Inicializando motor de áudio se necessário...');
+                    if (typeof win.initAudioEngine === 'function') {
+                        win.initAudioEngine();
+                    }
+                    const ctx = win.audioCtx;
+                    if (!ctx) {
+                        throw new Error('audioCtx não inicializado no iframe.');
+                    }
+                    log(`AudioContext status: ${ctx.state}`);
+
+                    // Interceptar criação de nós temporários para triggerChannelSynth
+                    log('Espionando a criação de nós no AudioContext...');
+                    const createdNodes = [];
+                    const originalCreateDelay = ctx.createDelay;
+                    const originalCreateChannelMerger = ctx.createChannelMerger;
+                    const originalCreateGain = ctx.createGain;
+
+                    ctx.createDelay = function(...args) {
+                        const node = originalCreateDelay.apply(this, args);
+                        createdNodes.push({ type: 'DelayNode', node });
+                        return node;
+                    };
+                    ctx.createChannelMerger = function(...args) {
+                        const node = originalCreateChannelMerger.apply(this, args);
+                        createdNodes.push({ type: 'ChannelMergerNode', node });
+                        return node;
+                    };
+                    ctx.createGain = function(...args) {
+                        const node = originalCreateGain.apply(this, args);
+                        createdNodes.push({ type: 'GainNode', node });
+                        return node;
+                    };
+
+                    try {
+                        const testChannelState = {
+                            type: 'sine',
+                            synthSettings: {
+                                delayMix: 0.5,
+                                delayTime: 0.25,
+                                delayFeedback: 0.75
+                            }
+                        };
+                        const mockDest = ctx.createGain();
+
+                        log('Disparando nota de teste (triggerChannelSynth)...');
+                        win.triggerChannelSynth(ctx, ctx.currentTime, 440, testChannelState, mockDest, 0.5);
+
+                        // Filtrar os nós criados durante o trigger
+                        const delays = createdNodes.filter(n => n.type === 'DelayNode');
+                        const mergers = createdNodes.filter(n => n.type === 'ChannelMergerNode');
+                        const gains = createdNodes.filter(n => n.type === 'GainNode');
+
+                        log(`Nós criados: DelayNodes: ${delays.length}, ChannelMergers: ${mergers.length}, GainNodes: ${gains.length}`);
+
+                        if (delays.length < 2) {
+                            throw new Error(`Esperado pelo menos 2 DelayNodes para o Ping-Pong Delay estéreo, mas encontrou ${delays.length}.`);
+                        }
+                        if (mergers.length < 1) {
+                            throw new Error('Esperado pelo menos 1 ChannelMergerNode para mesclar os canais L/R, mas não encontrou.');
+                        }
+
+                        // Localizar e verificar o feedback gain
+                        const feedbackGains = gains.filter(g => Math.abs(g.node.gain.value - 0.75) < 0.01);
+                        if (feedbackGains.length < 2) {
+                            throw new Error(`Esperado pelo menos 2 nós de feedback gain configurados com o valor de feedback 0.75, mas encontrou ${feedbackGains.length}.`);
+                        }
+                        log('Delay de Ping-Pong e Cross-Feedback validados com sucesso no motor de áudio.');
+                    } finally {
+                        // Restaurar métodos originais
+                        ctx.createDelay = originalCreateDelay;
+                        ctx.createChannelMerger = originalCreateChannelMerger;
+                        ctx.createGain = originalCreateGain;
+                    }
+                }
+            },
+            {
+                name: 'Note Tie step preservation in Code Editor & Parser',
+                run: async (win) => {
+                    log('Verificando se o parser aceita caracteres de ligadura "_"');
+                    const codeWithTies = `
+                        const bass = new Synth("bass");
+                        bass.setDelay(0.5, 0.25, 0.75);
+                        bass.play("C3 _ _ _ D3 . . .");
+                    `;
+                    const parsed = win.parseDAWCode(codeWithTies, true);
+                    log(`Código parseado com sucesso: ${JSON.stringify(parsed)}`);
+                    
+                    if (!parsed || !parsed.bass) {
+                        throw new Error('Parser falhou em retornar o canal de bass.');
+                    }
+                    
+                    const steps = parsed.bass.steps || parsed.bass;
+                    log(`Passos parseados: ${steps.slice(0, 8).join(', ')}`);
+                    
+                    if (steps[0] !== 'C3' || steps[1] !== '_' || steps[2] !== '_' || steps[3] !== '_') {
+                        throw new Error(`Passos de ligadura incorretos: esperado C3, _, _, _ mas obteve: ${steps.slice(0, 4).join(', ')}`);
+                    }
+
+                    log('Cálculo de duração de ligadura offline...');
+                    // Simular cálculo de duração no agendador offline
+                    let noteLen = 1;
+                    const stepDur = 0.25;
+                    let i = 1;
+                    while(steps[i] === '_') {
+                        noteLen++;
+                        i++;
+                    }
+                    const totalDur = noteLen * stepDur;
+                    log(`Duração calculada para a nota ligada: ${totalDur}s (esperado 1.0s)`);
+                    if (totalDur !== 1.0) {
+                        throw new Error(`Duração calculada incorreta: obtido ${totalDur}s, esperado 1.0s`);
+                    }
+                    log('Ligaduras validadas com sucesso no parser.');
+                }
+            },
+            {
+                name: 'Preservation of delayFeedback in Code Generator',
+                run: async (win) => {
+                    log('Configurando canal temporário para teste de geração de código...');
+                    win.channels['bass'] = {
+                        type: 'sine',
+                        steps: ['C3', '_', '_', '_', '.', '.', '.', '.'],
+                        synthSettings: {
+                            attack: 0.1,
+                            decay: 0.2,
+                            sustain: 0.6,
+                            release: 0.3,
+                            cutoff: 1000,
+                            resonance: 1.5,
+                            delayMix: 0.4,
+                            delayTime: 0.3,
+                            delayFeedback: 0.85,
+                            pitch: 0,
+                            humanizer: 0,
+                            sustainPedal: false
+                        }
+                    };
+
+                    log('Gerando código a partir do estado...');
+                    const generated = win.generateChannelCode('bass');
+                    log(`Código gerado:\n${generated}`);
+
+                    if (!generated.includes('setDelay(0.40, 0.30, 0.85)')) {
+                        throw new Error(`Código gerado não contém a chamada setDelay correta com feedback 0.85: "${generated}"`);
+                    }
+                    log('Geração de código com feedback verificado com sucesso.');
+                }
+            }
+        ];
+
+        async function startTests() {
+            log('Iniciando execução da suite de testes...');
+            let passedCount = 0;
+
+            for (let i = 0; i < tests.length; i++) {
+                const t = tests[i];
+                log(`Executando: ${t.name}...`);
+                
+                // Add pending display
+                const li = document.createElement('li');
+                li.className = 'test-case pending';
+                li.innerHTML = `
+                    <div class="test-title">
+                        <span>${t.name}</span>
+                        <span class="test-status">Executando</span>
+                    </div>
+                    <div class="test-log"></div>
+                `;
+                resultsList.appendChild(li);
+
+                const logDiv = li.querySelector('.test-log');
+
+                try {
+                    // Executar o teste no escopo da janela do iframe
+                    await t.run(dawFrame.contentWindow);
+                    
+                    li.className = 'test-case pass';
+                    li.querySelector('.test-status').innerText = 'PASS';
+                    logDiv.innerText = 'Tudo verificado com sucesso.';
+                    passedCount++;
+                    log(`✅ Passou: ${t.name}`, 'pass');
+                } catch (err) {
+                    li.className = 'test-case fail';
+                    li.querySelector('.test-status').innerText = 'FAIL';
+                    logDiv.innerText = err.stack || err.message;
+                    log(`❌ Falhou: ${t.name} -> ${err.message}`, 'fail');
+                }
+            }
+
+            log(`--- FIM DOS TESTES: ${passedCount}/${tests.length} passou ---`);
+            const summaryLi = document.createElement('li');
+            summaryLi.style.cssText = `margin-top: 15px; padding: 10px; font-weight: bold; border-radius: 4px; text-align: center; background: ${passedCount === tests.length ? 'var(--success)' : 'var(--failure)'}; color: #000;`;
+            summaryLi.innerText = `${passedCount === tests.length ? '✅ TODOS OS TESTES PASSARAM!' : '❌ ALGUNS TESTES FALHARAM.'} (${passedCount}/${tests.length})`;
+            resultsList.appendChild(summaryLi);
+        }
+
+        // Aguardar o iframe carregar
+        dawFrame.onload = () => {
+            log('Vite DAW Iframe carregado com sucesso.');
+            // Pequeno delay para garantir inicialização de DOMContentLoaded no iframe
+            setTimeout(startTests, 1000);
+        };
+    </script>
+</body>
+</html>
